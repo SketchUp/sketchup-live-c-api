@@ -1,0 +1,3 @@
+[submodule "third-party/ruby-c-extension-examples"]
+	path = third-party/ruby-c-extension-examples
+	url = https://github.com/SketchUp/ruby-c-extension-examples.git
