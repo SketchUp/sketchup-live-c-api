@@ -1,0 +1,30 @@
+{
+  // See https://go.microsoft.com/fwlink/?LinkId=733558
+  // for the documentation about the tasks.json format
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Debug in SketchUp 2020",
+      "type": "shell",
+      "command": "skippy",
+      "args": [
+        "sketchup:debug",
+        "2020"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Install C Extension",
+      "type": "shell",
+      "windows": {
+        "command": "xcopy",
+        "args": [
+          "${workspaceFolder}\\cext\\build\\release\\traceup.so",
+          "${workspaceFolder}\\src\\tt_traceup\\cext\\stage\\2.5\\",
+          "/Y"
+        ]
+      },
+      "problemMatcher": []
+    }
+  ]
+}

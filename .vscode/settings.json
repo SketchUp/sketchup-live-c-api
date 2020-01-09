@@ -1,0 +1,94 @@
+{
+  "editor.tabSize": 2,
+  "editor.rulers": [
+      80
+  ],
+
+  "solargraph.diagnostics": true,
+
+  // "cmake.loggingLevel": "debug",
+  "cmake.sourceDirectory": "${workspaceRoot}/cext",
+  "cmake.buildDirectory": "${workspaceRoot}/cext/build/${buildType}",
+  "cmake.configureOnOpen": true,
+  "catch2TestExplorer.executables":[
+    {
+      "name": "${filename}",
+      "description": "${relDirpath}/",
+      "pattern": "cext/build/**/*{test,Test,TEST}*"
+    }
+  ],
+  "testExplorer.sort": "byLabelWithSuitesFirst",
+
+  "search.exclude": {
+    "cext/third-party/**": true
+  },
+
+  "cSpell.words": [
+    "traceup"
+  ],
+
+  "files.trimTrailingWhitespace": true,
+  "files.associations": {
+    "*.in": "cpp",
+    "algorithm": "cpp",
+    "array": "cpp",
+    "cctype": "cpp",
+    "cmath": "cpp",
+    "concepts": "cpp",
+    "cstddef": "cpp",
+    "cstdint": "cpp",
+    "cstdio": "cpp",
+    "cstdlib": "cpp",
+    "cstring": "cpp",
+    "cwchar": "cpp",
+    "exception": "cpp",
+    "initializer_list": "cpp",
+    "ios": "cpp",
+    "iosfwd": "cpp",
+    "istream": "cpp",
+    "iterator": "cpp",
+    "limits": "cpp",
+    "memory": "cpp",
+    "new": "cpp",
+    "ostream": "cpp",
+    "stdexcept": "cpp",
+    "streambuf": "cpp",
+    "string": "cpp",
+    "system_error": "cpp",
+    "tuple": "cpp",
+    "type_traits": "cpp",
+    "typeinfo": "cpp",
+    "utility": "cpp",
+    "vector": "cpp",
+    "xfacet": "cpp",
+    "xiosbase": "cpp",
+    "xlocale": "cpp",
+    "xlocinfo": "cpp",
+    "xlocnum": "cpp",
+    "xmemory": "cpp",
+    "xstddef": "cpp",
+    "xstring": "cpp",
+    "xtr1common": "cpp",
+    "xutility": "cpp",
+    "cassert": "cpp",
+    "ctime": "cpp",
+    "deque": "cpp",
+    "forward_list": "cpp",
+    "fstream": "cpp",
+    "functional": "cpp",
+    "iomanip": "cpp",
+    "iostream": "cpp",
+    "list": "cpp",
+    "map": "cpp",
+    "set": "cpp",
+    "sstream": "cpp",
+    "unordered_map": "cpp",
+    "unordered_set": "cpp",
+    "xhash": "cpp",
+    "xlocmon": "cpp",
+    "xloctime": "cpp",
+    "xtree": "cpp",
+    "numeric": "cpp",
+    "queue": "cpp"
+  }
+}

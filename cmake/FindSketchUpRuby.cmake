@@ -5,12 +5,10 @@
 # TODO: Imported Target
 # https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#imported-targets
 
-# ${SketchUpRuby_DIR}
-# $ENV{SketchUpRuby_DIR}
-
 set(SketchUpRuby_VERSION "2019.0")
 
-find_path(_SketchUpRuby_ROOT_DIR "SketchUp Ruby C Extension Examples.sln")
+# Assumes the Ruby libs are in the sub-module.
+set(_SketchUpRuby_ROOT_DIR "third-party/ruby-c-extension-examples")
 set(_SketchUpRuby_THIRD_PARTY_DIR ${_SketchUpRuby_ROOT_DIR}/ThirdParty)
 
 # Include paths and library names:

@@ -1,0 +1,26 @@
+require: rubocop-sketchup
+
+AllCops:
+  DisabledByDefault: true
+  DisplayStyleGuide: true
+  ExtraDetails: true
+  SketchUp:
+    SourcePath: src
+    TargetSketchUpVersion: 2018
+  Exclude:
+    - cext/**/*
+
+SketchupDeprecations:
+  Enabled: true
+
+SketchupPerformance:
+  Enabled: true
+
+SketchupRequirements:
+  Enabled: true
+
+SketchupSuggestions:
+  Enabled: true
+
+SketchupBugs:
+  Enabled: true

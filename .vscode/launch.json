@@ -1,0 +1,101 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Listen for rdebug-ide",
+      "type": "Ruby",
+      "request": "attach",
+      "cwd": "${workspaceRoot}",
+      "remoteHost": "127.0.0.1",
+      "remotePort": "7000",
+      "remoteWorkspaceRoot": "${workspaceRoot}"
+    },
+    {
+      // https://code.visualstudio.com/docs/cpp/launch-json-reference
+      // https://vector-of-bool.github.io/docs/vscode-cmake-tools/debugging.html
+      "name": "CMake MSVC Launch",
+      "type": "cppvsdbg",
+      "request": "launch",
+      // Resolved by CMake Tools:
+      "program": "${command:cmake.launchTargetPath}",
+      "args": [
+        "--gtest_filter=TraceMapTest.TracePolygonsOnePolygon"
+      ],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      // "environment": [
+      //   {
+      //     "name": "PATH",
+      //     "value": "$PATH:$HOME/some_path"
+      //   },
+      //   {
+      //     "name": "OTHER_VALUE",
+      //     "value": "Something something"
+      //   }
+      // ],
+      // "externalConsole": true,
+      // "MIMode": "gdb",
+      // "setupCommands": [
+      //   {
+      //     "description": "Enable pretty-printing for gdb",
+      //     "text": "-enable-pretty-printing",
+      //     "ignoreFailures": true
+      //   }
+      // ]
+    },
+    {
+      "name": "(msvc) Launch",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "program": "C:/Program Files/SketchUp/SketchUp 2020/SketchUp.exe",
+      "args": [
+        "-RubyStartup",
+        "${workspaceFolder}\\cext\\debug.rb",
+        "-RubyStartupArg",
+        "${input:buildType}"
+      ],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      "externalConsole": false
+    },
+    {
+      "name": "(clang) Launch",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "/Applications/SketchUp 2020/SketchUp.app/Contents/MacOS/SketchUp",
+      "args": [
+        "-RubyStartup",
+        "${workspaceFolder}/cext/debug.rb",
+        "-RubyStartupArg",
+        "${input:buildType}"
+      ],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      "externalConsole": true,
+      "MIMode": "lldb",
+      "logging": {
+        "trace": true,
+        "traceResponse": true,
+        "engineLogging": true
+      }
+    }
+  ],
+  // https://code.visualstudio.com/docs/editor/variables-reference
+  "inputs": [
+    {
+      "id": "buildType",
+      "type": "pickString",
+      "description": "Build Type",
+      "options": [
+        "Release",
+        "Debug"
+      ],
+      "default": "Debug"
+    }
+  ]
+}
