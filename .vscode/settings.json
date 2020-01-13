@@ -20,12 +20,8 @@
   "testExplorer.sort": "byLabelWithSuitesFirst",
 
   "search.exclude": {
-    "cext/third-party/**": true
+    "third-party/**": true
   },
-
-  "cSpell.words": [
-    "traceup"
-  ],
 
   "files.trimTrailingWhitespace": true,
   "files.associations": {

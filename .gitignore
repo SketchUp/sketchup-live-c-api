@@ -1,3 +1,6 @@
 # SLAPI
 third-party/slapi/**/*
 !third-party/slapi/*.md
+
+# CMake
+cext/build/

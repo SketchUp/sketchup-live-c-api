@@ -1,5 +1,7 @@
 #pragma once
 
+// This header helps including Ruby across platforms and Ruby versions.
+
 ///// Visual Studio CRT Config /////////////////////////////////////////////////
 
 // Disable all warnings.

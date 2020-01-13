@@ -1,3 +1,6 @@
+# TODO: This find-module is an intermediate solution until we get around to
+#       add CMake configuration directly in the SketchUp Ruby C Extension
+#       example project.
 
 # https://cmake.org/cmake/help/latest/manual/cmake-packages.7.html
 # https://cmake.org/cmake/help/latest/manual/cmake-developer.7.html#manual:cmake-developer(7)
@@ -7,8 +10,7 @@
 
 set(SketchUpRuby_VERSION "2019.0")
 
-# Assumes the Ruby libs are in the sub-module.
-set(_SketchUpRuby_ROOT_DIR "third-party/ruby-c-extension-examples")
+find_path(_SketchUpRuby_ROOT_DIR "SketchUp Ruby C Extension Examples.sln")
 set(_SketchUpRuby_THIRD_PARTY_DIR ${_SketchUpRuby_ROOT_DIR}/ThirdParty)
 
 # Include paths and library names:

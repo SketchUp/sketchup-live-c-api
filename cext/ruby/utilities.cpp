@@ -2,7 +2,7 @@
 
 // #include <sstream>
 
-namespace traceup {
+namespace example {
 namespace ruby {
 
 
@@ -67,26 +67,5 @@ VALUE GetVALUE(double number)
 }
 
 
-#ifdef __clang__
-VALUE GetVALUE(size_t number)
-{
-  return GetVALUE(static_cast<unsigned long long>(number));
-}
-#endif
-
-
-// Convert the Ruby VALUE to either Qtrue or Qfalse.
-VALUE GetBooleanVALUE(VALUE value)
-{
-  return RTEST(value) ? Qtrue : Qfalse;
-}
-
-
-bool IsBoolean(VALUE object)
-{
-  return object == Qtrue || object == Qfalse;
-}
-
-
 } // namespace ruby
-} // namespace traceup
+} // namespace example

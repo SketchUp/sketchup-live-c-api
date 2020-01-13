@@ -5,14 +5,14 @@ cmake_minimum_required(VERSION 3.15.4)
 
 # set(CMAKE_DEBUG_TARGET_PROPERTIES INCLUDE_DIRECTORIES)
 
-# SketchUp 2020.0 only supports macOS 10.13 and newer.
-# https://stackoverflow.com/a/34208904/486990
-set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "Minimum OS X deployment version")
+# SketchUp 2019.0 supports macOS 10.12 and newer.
+set(CMAKE_OSX_DEPLOYMENT_TARGET "10.12" CACHE STRING "Minimum OS X deployment version")
 
 # https://crascit.com/2015/03/28/enabling-cxx11-in-cmake/
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+# TODO:
 # https://gitlab.com/CLIUtils/modern-cmake/blob/master/examples/extended-project/apps/CMakeLists.txt
 # target_compile_features(app PRIVATE cxx_std_17)
 
@@ -33,8 +33,9 @@ if(NOT (WIN32 OR APPLE))
 endif()
 
 # https://cmake.org/cmake/help/latest/guide/tutorial/index.html
-project(TraceUp VERSION 0.1.0 LANGUAGES CXX C)
-configure_file(traceup_config.hpp.in traceup_config.hpp)
+# TODO(Example): Name your project:
+project(Example VERSION 0.1.0 LANGUAGES CXX C)
+configure_file(example_config.hpp.in example_config.hpp)
 
 # Specify the list of directories to search for cmake modules.
 # https://cliutils.gitlab.io/modern-cmake/chapters/basics/structure.html
@@ -57,6 +58,26 @@ endif()
 include(CTest)
 enable_testing()
 
+# unset(SketchUpAPI_SEARCH_DIR) # TODO: Remove - debug!
+message(STATUS "SketchUpAPI_SEARCH_DIR: ${SketchUpAPI_SEARCH_DIR}")
+message(STATUS "ENV SketchUpAPI_SEARCH_DIR: $ENV{SketchUpAPI_SEARCH_DIR}")
+# message(DEBUG "_SketchUpAPI_BASENAME_DIR: ${_SketchUpAPI_BASENAME_DIR}")
+# message(STATUS "SketchUpAPI_SEARCH_DIR: ${SketchUpAPI_SEARCH_DIR}")
+# if(EXISTS ${SketchUpAPI_SEARCH_DIR} OR EXISTS $ENV{SketchUpAPI_SEARCH_DIR})
+if(DEFINED SketchUpAPI_SEARCH_DIR OR DEFINED ENV{SketchUpAPI_SEARCH_DIR})
+  message(STATUS "Using pre-defined SLAPI path: ${SketchUpAPI_SEARCH_DIR}")
+else()
+  set(SketchUpAPI_SEARCH_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../third-party/slapi)
+  message(STATUS "Using project-defined SLAPI path: ${SketchUpAPI_SEARCH_DIR} $ENV{SketchUpAPI_SEARCH_DIR}")
+endif()
+
+# set(CMAKE_PREFIX_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../third-party/ruby-c-extension-examples )
+list(PREPEND CMAKE_PREFIX_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../third-party/ruby-c-extension-examples)
+
+# set SketchUpAPI_SEARCH_DIR=C:\\Users\\Thomas\\SLAPI
+# set CMAKE_PREFIX_PATH=C:\\Users\\Thomas\\Source\\ruby-c-extension-examples
+# set(RUBY_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/third-party/ruby-c-extension-examples)
+
 find_package(SketchUpRuby 2019.0 REQUIRED)
 # TODO: Can we import selected targets from Find Modules?
 # https://cmake.org/cmake/help/latest/manual/cmake-developer.7.html#find-modules
@@ -67,58 +88,60 @@ find_package(SketchUpRuby 2019.0 REQUIRED)
 
 # https://github.com/google/googletest/blob/master/googletest/README.md
 # https://crascit.com/2015/07/25/cmake-gtest/
-# Ensure we build static CRT.
+# Ensure we build static CRT for GoogleTest to match the rest of the project.
 set(gtest_force_shared_crt OFF CACHE BOOL "" FORCE)
 
 # Don't want to install GoogleTest.
 set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
 
-add_subdirectory(traceup)
-add_subdirectory(third-party/googletest)
-add_subdirectory(tests)
+# TODO: Demonstrate using static lib for modularity/testing.
+add_subdirectory(image_lib)
+# add_subdirectory(third-party/googletest)
+# add_subdirectory(tests)
 
-# CMake does not recommend using GLOB to collect a list of source files from
+# CMake recommends not using GLOB to collect a list of source files from
 # the source tree.
 # https://cmake.org/cmake/help/latest/command/file.html#filesystem
-# file(GLOB SOURCES "${PROJECT_SOURCE_DIR}/**/*.cpp")
-# file(GLOB_RECURSE  SOURCES "*.cpp")
 set(SOURCES
-  ruby/traceup_extension.cpp
+  ruby/example_extension.cpp
   ruby/utilities.cpp
 )
 
-set(TRACEUP traceup)
+# TODO(Example): Name your extension here. This will be the filename of the
+# binaries:
+set(EXTENSION_NAME example)
 
-set(TRACEUP_RUBY_VERSIONS "2.2" "2.5")
-foreach(RUBY_VERSION ${TRACEUP_RUBY_VERSIONS})
+# TODO(Example): Set the versions of Ruby you build against here:
+set(EXTENSION_RUBY_VERSIONS "2.2" "2.5")
+foreach(RUBY_VERSION ${EXTENSION_RUBY_VERSIONS})
   # Generate a "250" style string from "2.5" style string:
   # TODO: Offer utility functions to generate the variables.
   string(REPLACE "." "" RUBY_VERSION_ID ${RUBY_VERSION})
   set(RUBY_VERSION_ID "${RUBY_VERSION_ID}0")
 
   # Ensure a lib with unique name for each Ruby version:
-  set(TRACEUP_LIB ${TRACEUP}_${RUBY_VERSION_ID})
+  set(EXTENSION_LIB ${EXTENSION_NAME}_${RUBY_VERSION_ID})
 
   # Resolve the target name this Ruby version:
   set(SketchUpRuby_LIBRARY "SketchUp::SketchUpRuby_${RUBY_VERSION_ID}")
 
   if(APPLE)
     # For Mac, the library needs to be of Mach-O type: Bundle
-    add_library(${TRACEUP_LIB} MODULE ${SOURCES})
+    add_library(${EXTENSION_LIB} MODULE ${SOURCES})
   else()
-    add_library(${TRACEUP_LIB} SHARED ${SOURCES})
+    add_library(${EXTENSION_LIB} SHARED ${SOURCES})
   endif()
 
-  target_link_libraries(${TRACEUP_LIB} PRIVATE traceup_static)
+  target_link_libraries(${EXTENSION_LIB} PRIVATE example_static)
 
   # Need to correct the names since the name of each library for each Ruby
   # version is exactly the same. By default CMake uses the CMake target name
   # for the file names.
-  set_target_properties(${TRACEUP_LIB} PROPERTIES
-    OUTPUT_NAME ${TRACEUP}
-    DEFINE_SYMBOL ${TRACEUP}_EXPORTS
+  set_target_properties(${EXTENSION_LIB} PROPERTIES
+    OUTPUT_NAME ${EXTENSION_NAME}
+    DEFINE_SYMBOL ${EXTENSION_NAME}_EXPORTS
   )
-  set_target_properties(${TRACEUP_LIB} PROPERTIES
+  set_target_properties(${EXTENSION_LIB} PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${RUBY_VERSION}"
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${RUBY_VERSION}"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${RUBY_VERSION}"
@@ -128,25 +151,25 @@ foreach(RUBY_VERSION ${TRACEUP_RUBY_VERSIONS})
   # https://cmake.org/cmake/help/latest/module/GenerateExportHeader.html
   include("GenerateExportHeader")
   # TODO: Set visibility?
-  generate_export_header(${TRACEUP_LIB}
-    BASE_NAME ${TRACEUP}
-    # EXPORT_MACRO_NAME ${TRACEUP}_EXPORTS
+  generate_export_header(${EXTENSION_LIB}
+    BASE_NAME ${EXTENSION_NAME}
+    # EXPORT_MACRO_NAME ${EXTENSION_NAME}_EXPORTS
   )
 
   # Include path for CMake auto-generated files:
-  target_include_directories(${TRACEUP_LIB} PUBLIC ${CMAKE_BINARY_DIR})
+  target_include_directories(${EXTENSION_LIB} PUBLIC ${CMAKE_BINARY_DIR})
 
   # The projects include paths:
-  target_include_directories(${TRACEUP_LIB} PUBLIC ${PROJECT_SOURCE_DIR})
+  target_include_directories(${EXTENSION_LIB} PUBLIC ${PROJECT_SOURCE_DIR})
 
   # Third party libraries:
-  target_link_libraries(${TRACEUP_LIB} PUBLIC ${SketchUpRuby_LIBRARY})
+  target_link_libraries(${EXTENSION_LIB} PUBLIC ${SketchUpRuby_LIBRARY})
 
   # https://arne-mertz.de/2018/07/cmake-properties-options/
   if(MSVC)
     # Elevate warning level.
     # Ignore unknown pragmas (mac).
-    target_compile_options(${TRACEUP_LIB} PRIVATE
+    target_compile_options(${EXTENSION_LIB} PRIVATE
       /W4 /WX
       /wd4068
     )
@@ -190,46 +213,47 @@ foreach(RUBY_VERSION ${TRACEUP_RUBY_VERSIONS})
     # > handling.
     #
     # https://docs.microsoft.com/en-us/cpp/cpp/using-setjmp-longjmp?view=vs-2019
-    target_compile_options(${TRACEUP_LIB} PRIVATE /EHs)
+    target_compile_options(${EXTENSION_LIB} PRIVATE /EHs)
 
     # Ruby require the library to have .so extension on Windows.
     # https://cmake.org/cmake/help/v3.0/command/set_target_properties.html
     # https://cmake.org/cmake/help/latest/command/set_target_properties.html
-    set_target_properties(${TRACEUP_LIB} PROPERTIES SUFFIX ".so" )
+    set_target_properties(${EXTENSION_LIB} PROPERTIES SUFFIX ".so" )
 
     # On Windows we must link to sketchup.lib to use the Live C API.
-    # target_link_libraries(${TRACEUP_LIB} ${SketchUpAPI_LIBRARY})
+    # TODO:
+    # target_link_libraries(${EXTENSION_LIB} ${SketchUpAPI_LIBRARY})
   else()
     # Elevate warning level.
     # Ignore unknown pragmas (win) and Ruby's usage of `register`.
-    target_compile_options(${TRACEUP_LIB} PRIVATE
+    target_compile_options(${EXTENSION_LIB} PRIVATE
       -Wall -Wextra -pedantic -Werror
       -Wno-unknown-pragmas -Wno-register
     )
 
     # Ruby require the library to have .bundle extension on OSX.
-    set_target_properties(${TRACEUP_LIB} PROPERTIES SUFFIX ".bundle" )
+    set_target_properties(${EXTENSION_LIB} PROPERTIES SUFFIX ".bundle" )
     # Remove the "lib" prefix as the name must match the Init_* function.
-    set_target_properties(${TRACEUP_LIB} PROPERTIES PREFIX "" )
+    set_target_properties(${EXTENSION_LIB} PROPERTIES PREFIX "" )
   endif()
 
 
   set(EXTENSION_DIR ${PROJECT_SOURCE_DIR}/../src)
-  set(EXTENSION_STAGE_DIR ${EXTENSION_DIR}/tt_traceup/cext/stage)
+  set(EXTENSION_STAGE_DIR ${EXTENSION_DIR}/example/cext/stage)
   # RUNTIME DESTINATION is needed for Windows (SHARED).
   # RUNTIME DESTINATION is needed for Mac (MODULE).
-  install(TARGETS ${TRACEUP_LIB}
+  install(TARGETS ${EXTENSION_LIB}
     RUNTIME DESTINATION ${PROJECT_SOURCE_DIR}/bin/$<CONFIG>/${RUBY_VERSION}
     LIBRARY DESTINATION ${PROJECT_SOURCE_DIR}/bin/$<CONFIG>/${RUBY_VERSION}
   )
-  install(TARGETS ${TRACEUP_LIB}
+  install(TARGETS ${EXTENSION_LIB}
     RUNTIME DESTINATION ${EXTENSION_STAGE_DIR}/${RUBY_VERSION}
     LIBRARY DESTINATION ${EXTENSION_STAGE_DIR}/${RUBY_VERSION}
   )
   # TODO: Clean extension cext directory for anything except the stage directory.
   # https://cmake.org/cmake/help/latest/command/install.html#custom-installation-logic
 
-endforeach() # TRACEUP_RUBY_VERSIONS
+endforeach() # EXTENSION_RUBY_VERSIONS
 
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
