@@ -9,6 +9,23 @@ A third usage, officially supported since SketchUp 2019.2 it allows _read only_ 
 
 This is a guide demonstrating how to setup and build your own Ruby C extension that uses the SketchUp C API to read from the active model.
 
+## General Instructions
+
+`<SDK_PATH>` is the location where the SDK package is unpackages.
+
+### Windows
+
+* Add `<SDK_PATH>\headers` to the include paths.
+* Link against `<SDK_PATH>\binaries\sketchup\x64\sketchup.lib` (Do **not** link against `SketchUpAPI.lib`!)
+
+### macOS
+
+* Add `<SDK_PATH>` to framework search paths.
+* Set `/Application/SketchUp 2019/SketchUp.app/Contents/MacOS/SketchUp` as the bundle loader. (Do **not** link against `SketchUpAPI.framework`!)
+
+
+## Editor Instructions
+
 The code in this repository will demonstrate a [CMake](https://cmake.org/) project for a Windows & Mac builds. This CMake project can be used to create a [Visual Studio solution](https://visualstudio.microsoft.com/), [Xcode project](https://developer.apple.com/xcode/).
 
 
