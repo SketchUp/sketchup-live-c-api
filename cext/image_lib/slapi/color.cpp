@@ -2,7 +2,7 @@
 
 #include <cassert>
 
-namespace traceup {
+namespace example {
 
 SUByte Luminance(const SUColor& color) {
   // Original:
@@ -15,4 +15,4 @@ SUByte Luminance(const SUColor& color) {
   return static_cast<SUByte>(value);
 }
 
-} // namespace traceup
+} // namespace example

@@ -85,6 +85,12 @@
     "xloctime": "cpp",
     "xtree": "cpp",
     "numeric": "cpp",
-    "queue": "cpp"
+    "queue": "cpp",
+    "chrono": "cpp",
+    "filesystem": "cpp",
+    "locale": "cpp",
+    "ratio": "cpp",
+    "xlocbuf": "cpp",
+    "xlocmes": "cpp"
   }
 }

@@ -2,7 +2,7 @@
 
 #include <SketchUpAPI/color.h>
 
-namespace traceup {
+namespace example {
 
 // Utility Color structure to be used with SUImageRep. It's members are arranged
 // according to the RGBA/BGRA layout the various platforms expects.
@@ -50,4 +50,4 @@ inline bool operator!=(const Color& lhs, const Color& rhs) {
 // Colorimetric conversion to greyscale.
 SUByte Luminance(const SUColor& color);
 
-} // namespace traceup
+} // namespace example
