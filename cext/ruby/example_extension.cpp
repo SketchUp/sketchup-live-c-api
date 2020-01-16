@@ -1,9 +1,11 @@
 #include "example_config.hpp"
 #include "example_export.h"
 
+#include <array>
 #include <algorithm>
 #include <cassert>
 #include <filesystem>
+#include <functional>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -40,6 +42,15 @@ VALUE new_ruby_image_rep() {
 //   return instance;
 // }
 
+std::string FileExtension(const std::string filename)
+{
+  const auto index = filename.rfind('.');
+  if (index == std::string::npos) {
+    return "";
+  }
+  return filename.substr(index);
+}
+
 std::string UniqueFilename(
   const std::string& output_path,
   const std::string& texture_filename)
@@ -56,8 +67,49 @@ std::string UniqueFilename(
     }
   }
 
+  assert(!std::filesystem::exists(filename));
   return filename;
 }
+
+enum class FilterType {
+  GreyScale,
+  ChromaticAberration
+};
+
+FilterType GetRubyFilterType(VALUE ruby_filter_type) {
+  Check_Type(ruby_filter_type, T_SYMBOL);
+  const ID filter_type = SYM2ID(ruby_filter_type);
+  if (filter_type == rb_intern("grey_scale")) {
+    return FilterType::GreyScale;
+  } else if (filter_type == rb_intern("chromatic_aberration")) {
+    return FilterType::ChromaticAberration;
+  } else {
+    rb_raise(rb_eArgError, "invalid filter type");
+  }
+}
+
+struct Point2d {
+  int x;
+  int y;
+};
+
+struct GreyScaleOptions {
+  float amount;
+};
+
+struct ChromaticAberrationOptions {
+  Point2d offsets[4];
+};
+
+union FilterOptionsValue {
+  GreyScaleOptions grey_scale;
+  ChromaticAberrationOptions chromatic_aberration;
+};
+
+struct FilterOptions {
+  FilterType type;
+  FilterOptionsValue value;
+};
 
 } // namespace
 
@@ -89,7 +141,7 @@ VALUE num_faces(VALUE self)
   return SIZET2NUM(num_faces);
 }
 
-VALUE export_textures(VALUE self, VALUE ruby_path, VALUE ruby_greyscale)
+VALUE image_filter(VALUE self, VALUE ruby_face_pid, VALUE ruby_path, VALUE ruby_options)
 {
   SUModelRef model = SU_INVALID;
   SU(SUApplicationGetActiveModel(&model));
@@ -98,64 +150,105 @@ VALUE export_textures(VALUE self, VALUE ruby_path, VALUE ruby_greyscale)
     return Qnil;
   }
 
+
+  SUInstancePathRef face_path = GetRubyInstancePath(ruby_face_pid);
+
+  SUEntityRef entity = SU_INVALID;
+  SUInstancePathGetLeafAsEntity(face_path, &entity);
+
+  if (SUEntityGetType(entity) != SURefType_Face) {
+    rb_raise(rb_eTypeError, "invalid face references");
+    return Qnil;
+  }
+
+
   std::string output_path(RSTRING_PTR(ruby_path));
 
-  bool greyscale = RTEST(ruby_greyscale);
 
-  size_t num_materials = 0;
-  SU(SUModelGetNumMaterials(model, &num_materials));
-  std::vector<SUMaterialRef> materials(num_materials, SU_INVALID);
-  SU(SUModelGetMaterials(model, materials.size(), materials.data(), &num_materials));
+  Check_Type(ruby_options, T_HASH);
 
-  for (const auto& material : materials) {
-    SUMaterialType type = SUMaterialType_Colored;
-    SU(SUMaterialGetType(material, &type));
-    if (type == SUMaterialType_Colored) {
-      continue;
+  FilterOptions options;
+
+  VALUE ruby_filter_type = rb_hash_aref(ruby_options, ID2SYM(rb_intern("filter_type")));
+  options.type = GetRubyFilterType(ruby_filter_type);
+
+  std::function<Color(const SUColor& color)> filter;
+  switch (options.type) {
+  case FilterType::GreyScale:
+    filter = [](const SUColor& color) -> Color {
+      const auto luminance = Luminance(color);
+      return { luminance, luminance, luminance, color.alpha };
+    };
+    break;
+  case FilterType::ChromaticAberration:
+    VALUE ruby_offsets = rb_hash_aref(ruby_options, ID2SYM(rb_intern("filter_type")));
+    Check_Type(ruby_offsets, T_ARRAY);
+    if (RARRAY_LEN(ruby_offsets) != 3) {
+      rb_raise(rb_eArgError, "unexpected offsets size");
     }
-
-    SUTextureRef texture = SU_INVALID;
-    SU(SUMaterialGetTexture(material, &texture));
-
-    SUImageRepRef image_rep = SU_INVALID;
-    SU(SUTextureGetColorizedImageRep(texture, &image_rep));
-
-    if (greyscale) {
-      size_t data_size = 0, bits_per_pixel = 0;
-      SU(SUImageRepGetDataSize(image_rep, &data_size, &bits_per_pixel));
-
-      size_t width = 0, height = 0;
-      SU(SUImageRepGetPixelDimensions(image_rep, &width, &height));
-
-      size_t num_pixels = width * height;
-      std::vector<SUColor> colors(num_pixels);
-      SU(SUImageRepGetDataAsColors(image_rep, colors.data()));
-
-      // Note: using `Color` here and not `SUColor` as it helps in serializing the
-      // color data to a byte buffer compatible with the platform specific order.
-      std::vector<Color> greyscale(num_pixels);
-      std::transform(begin(colors), end(colors), begin(greyscale),
-        [](const SUColor& color) -> Color {
-          const auto luminance = Luminance(color);
-          return { luminance, luminance, luminance, color.alpha };
-        }
-      );
-
-      auto buffer = reinterpret_cast<SUByte*>(greyscale.data());
-      SU(SUImageRepSetData(image_rep, width, height, 32, 0, buffer));
+    VALUE* ruby_offsets_array = RARRAY_PTR(ruby_offsets);
+    std::array<Point2d, 3> offsets;
+    for (size_t i = i; i < 3; ++i) {
+      offsets[i] = GetRubyPoint2d(ruby_offsets_array[i]);
     }
+    options.value.chromatic_aberration.offsets = offsets.data();
 
-    SUStringRef filename_ref = SU_INVALID;
-    SU(SUTextureGetFileName(texture, &filename_ref));
-    std::string texture_filename = GetString(filename_ref);
-    SU(SUStringRelease(&filename_ref));
-
-    std::string output_filepath = UniqueFilename(output_path, texture_filename);
-
-    SU(SUImageRepSaveToFile(image_rep, output_filepath.c_str()));
-
-    SU(SUImageRepRelease(&image_rep));
+    // TODO: get offsets per color channel
+    filter = [&options](const SUColor& color) -> Color {
+      const auto luminance = ChromaticAberration(color, options.value.chromatic_aberration);
+      return { luminance, luminance, luminance, color.alpha };
+    };
+    break;
   }
+
+
+  SUFaceRef face = SUFaceFromEntity(entity);
+
+  SUMaterialRef material = SU_INVALID;
+  SUFaceGetFrontMaterial(face, &material);
+
+  SUMaterialType type = SUMaterialType_Colored;
+  SU(SUMaterialGetType(material, &type));
+  if (type == SUMaterialType_Colored) {
+    rb_raise(rb_eArgError, "face has no texture");
+    return Qnil;
+  }
+
+
+  SUTextureRef texture = SU_INVALID;
+  SU(SUMaterialGetTexture(material, &texture));
+
+  SUImageRepRef image_rep = SU_INVALID;
+  SU(SUTextureGetColorizedImageRep(texture, &image_rep));
+
+  size_t data_size = 0, bits_per_pixel = 0;
+  SU(SUImageRepGetDataSize(image_rep, &data_size, &bits_per_pixel));
+
+  size_t width = 0, height = 0;
+  SU(SUImageRepGetPixelDimensions(image_rep, &width, &height));
+
+  size_t num_pixels = width * height;
+  std::vector<SUColor> colors(num_pixels);
+  SU(SUImageRepGetDataAsColors(image_rep, colors.data()));
+
+  // Note: using `Color` here and not `SUColor` as it helps in serializing the
+  // color data to a byte buffer compatible with the platform specific order.
+  std::vector<Color> result(num_pixels);
+  std::transform(begin(colors), end(colors), begin(result), filter);
+
+  auto buffer = reinterpret_cast<SUByte*>(result.data());
+  SU(SUImageRepSetData(image_rep, width, height, 32, 0, buffer));
+
+  SUStringRef filename_ref = SU_INVALID;
+  SU(SUTextureGetFileName(texture, &filename_ref));
+  std::string texture_filename = GetString(filename_ref);
+  SU(SUStringRelease(&filename_ref));
+
+  std::string output_filepath = UniqueFilename(output_path, texture_filename);
+
+  SU(SUImageRepSaveToFile(image_rep, output_filepath.c_str()));
+
+  SU(SUImageRepRelease(&image_rep));
 
   return Qtrue;
 }
@@ -204,8 +297,8 @@ EXAMPLE_EXPORT void Init_example()
 
   rb_define_module_function(mExample, "num_faces",
       VALUEFUNC(num_faces), 0);
-  rb_define_module_function(mExample, "export_textures",
-      VALUEFUNC(export_textures), 2);
+  rb_define_module_function(mExample, "image_filter",
+      VALUEFUNC(image_filter), 2);
 }
 
 } // extern "C"
