@@ -28,7 +28,23 @@
       "cwd": "${workspaceFolder}",
     },
     {
-      "name": "(msvc) Launch",
+      "name": "(msvc) Launch SU2019",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "program": "C:/Program Files/SketchUp/SketchUp 2019/SketchUp.exe",
+      "args": [
+        "-RubyStartup",
+        "${workspaceFolder}\\cext\\debug.rb",
+        "-RubyStartupArg",
+        "${input:buildType}"
+      ],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      "externalConsole": false
+    },
+    {
+      "name": "(msvc) Launch SU2020",
       "type": "cppvsdbg",
       "request": "launch",
       "program": "C:/Program Files/SketchUp/SketchUp 2020/SketchUp.exe",

@@ -8,10 +8,12 @@ set(HEADER_LIST
   slapi/utilities.hpp
   slapi/color.hpp
   image.hpp
+  trace.hpp
 )
 set(SOURCES
   slapi/color.cpp
   image.cpp
+  trace.cpp
 )
 source_group(TREE ${CMAKE_CURRENT_LIST_DIR} FILES ${SOURCES} ${HEADER_LIST})
 

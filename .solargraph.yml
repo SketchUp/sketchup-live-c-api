@@ -1,6 +1,6 @@
 require_paths:
 - "C:/Program Files/SketchUp/SketchUp 2019/Tools"
-- src
+- ruby
 
 require:
 - sketchup-api-stubs
@@ -9,5 +9,5 @@ reporters:
 - rubocop
 
 exclude:
-- /build/**/*
-- /ThirdParty/**/*
+- cext/build/**/*
+- third-party/**/*

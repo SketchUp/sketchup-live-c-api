@@ -41,6 +41,7 @@ SUInstancePathRef GetRubyInstancePath(SUModelRef model, VALUE ruby_pid)
   SU(SUStringCreateFromUTF8(&pid_ref, pid));
 
   SUInstancePathRef instance_path = SU_INVALID;
+  SU(SUInstancePathCreate(&instance_path));
   SU(SUModelGetInstancePathByPid(model, pid_ref, &instance_path));
 
   SU(SUStringRelease(&pid_ref));
@@ -100,6 +101,8 @@ VALUE grey_scale(VALUE self, VALUE ruby_face_pid, VALUE ruby_amount, VALUE ruby_
   SUEntityRef entity = SU_INVALID;
   SUInstancePathGetLeafAsEntity(face_path, &entity);
 
+  SU(SUInstancePathRelease(&face_path));
+
   if (SUEntityGetType(entity) != SURefType_Face) {
     rb_raise(rb_eTypeError, "invalid face references");
   }
@@ -128,6 +131,7 @@ VALUE grey_scale(VALUE self, VALUE ruby_face_pid, VALUE ruby_amount, VALUE ruby_
   SU(SUMaterialGetTexture(material, &texture));
 
   SUImageRepRef image_rep = SU_INVALID;
+  SU(SUImageRepCreate(&image_rep));
   SU(SUTextureGetColorizedImageRep(texture, &image_rep));
 
   size_t data_size = 0, bits_per_pixel = 0;
@@ -154,6 +158,7 @@ VALUE grey_scale(VALUE self, VALUE ruby_face_pid, VALUE ruby_amount, VALUE ruby_
   SU(SUImageRepSetData(image_rep, width, height, 32, 0, buffer));
 
   SUStringRef filename_ref = SU_INVALID;
+  SU(SUStringCreate(&filename_ref));
   SU(SUTextureGetFileName(texture, &filename_ref));
   std::string texture_filename = GetString(filename_ref);
   SU(SUStringRelease(&filename_ref));
@@ -179,11 +184,12 @@ EXAMPLE_EXPORT void Init_example()
 {
   using namespace example::ruby;
 
-  VALUE mExample = rb_define_module("Example");
+  VALUE mExamples = rb_define_module("Examples");
+  VALUE mLiveCAPI = rb_define_module_under(mExamples, "LiveCAPI");
 
-  rb_define_const(mExample, "CEXT_VERSION", GetVALUE(EXAMPLE_VERSION));
+  rb_define_const(mLiveCAPI, "CEXT_VERSION", GetVALUE(EXAMPLE_VERSION));
 
-  rb_define_module_function(mExample, "grey_scale",
+  rb_define_module_function(mLiveCAPI, "grey_scale",
       VALUEFUNC(grey_scale), 3);
 }
 

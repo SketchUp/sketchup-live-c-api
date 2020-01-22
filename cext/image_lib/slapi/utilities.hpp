@@ -6,13 +6,17 @@
 
 #include <SketchUpAPI/common.h>
 
+#include "trace.hpp"
+
+
+namespace example {
 
 #define SU(api_function_call) {\
   [[maybe_unused]] SUResult su_api_result = api_function_call;\
+  if (SU_ERROR_NONE != su_api_result) { TRACE(L"\nSU_RESULT: %i\n", su_api_result); }\
   assert(SU_ERROR_NONE == su_api_result);\
 }
 
-namespace example {
 
 std::string GetString(const SUStringRef& string) {
   size_t length = 0;
