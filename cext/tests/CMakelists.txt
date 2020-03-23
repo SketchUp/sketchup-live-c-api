@@ -1,0 +1,26 @@
+# Based on "Professional CMake" Chapter 24.9
+
+include(GoogleTest)
+
+# Helper files for the tests:
+set(SOURCES
+  # regex_matchers.h
+)
+
+# The tests themselves:
+set(TEST_SOURCES
+  test_slapi_color.cpp
+  test_slapi_utilities.cpp
+  test_image.cpp
+)
+
+# TODO(Example): Set the name of the test binary here:
+set(TEST_APP_NAME image_lib_tests)
+
+add_executable(${TEST_APP_NAME} ${SOURCES} ${TEST_SOURCES})
+target_link_libraries(${TEST_APP_NAME} gtest_main gmock_main example_static)
+target_include_directories(${TEST_APP_NAME} PRIVATE ${CMAKE_CURRENT_LIST_DIR})
+
+set_default_warnings(${TEST_APP_NAME})
+
+gtest_discover_tests(${TEST_APP_NAME})

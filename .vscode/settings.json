@@ -6,10 +6,13 @@
 
   "solargraph.diagnostics": true,
 
-  // "cmake.loggingLevel": "debug",
-  "cmake.sourceDirectory": "${workspaceRoot}/cext",
+  // "cmake.loggingLevel": "debug", // CMakeTools
   "cmake.buildDirectory": "${workspaceRoot}/cext/build/${buildType}",
   "cmake.configureOnOpen": true,
+  "cmake.configureArgs": [
+    // https://github.com/microsoft/vscode-cmake-tools/issues/892
+    // "--log-level=DEBUG" // Enable to get more info from CMake.
+  ],
   "catch2TestExplorer.executables":[
     {
       "name": "${filename}",
