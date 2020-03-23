@@ -1,3 +1,7 @@
+# TODO: Make a similar CMake module for the standalone version.
+# TODO: Create utility version to reuse logic for version lookup and search.
+#       Each module target different binaries.
+
 # TODO: Rename to LiveSketchUpAPI ?
 
 # https://cmake.org/cmake/help/latest/manual/cmake-packages.7.html
@@ -11,6 +15,11 @@
 # $ENV{SketchUpAPI_DIR}
 # $ENV{SketchUpAPI_SEARCH_DIR}
 
+set(_SketchUpAPI_2020_0
+  2020.0
+  SDK_WIN_x64_2020-0-363
+  SDK_Mac_2020-0-362
+)
 set(_SketchUpAPI_2019_3
   2019.3
   SDK_WIN_x64_2019-3-253
@@ -23,12 +32,13 @@ set(_SketchUpAPI_2019_2
 )
 
 set(_SketchUpAPIs
+  ${_SketchUpAPI_2020_0}
   ${_SketchUpAPI_2019_3}
   ${_SketchUpAPI_2019_2}
 )
 
-set(_num_versions 2)
-set(_version_size 3)
+set(_num_versions 3) # UPDATE: Should match items in `_SketchUpAPIs`
+set(_version_size 3) # Size of the version arrays.
 
 LIST(LENGTH _SketchUpAPIs _length)
 MATH(EXPR _range_max "(${_version_size}*${_num_versions})-1")
@@ -113,6 +123,8 @@ find_library(SketchUpAPI_LIBRARY ${_SketchUpAPI_LIBRARY_NAME}
 if(APPLE)
     # TODO: Search multiple version paths
     # TODO: Make this requred var on macOS?
+    # TODO: Can the logic of setting this on the target that links to it be
+    #       done here in this module?
     set(SketchUpAPI_BUNDLE_LOADER
       "/Applications/SketchUp 2019/SketchUp.app/Contents/MacOS/SketchUp"
       CACHE PATH "Bundle Loader"

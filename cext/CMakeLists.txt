@@ -94,6 +94,26 @@ set(gtest_force_shared_crt OFF CACHE BOOL "" FORCE)
 # Don't want to install GoogleTest.
 set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
 
+# Utility function to set base warning properties.
+function(set_default_warnings TARGET_NAME)
+  # https://arne-mertz.de/2018/07/cmake-properties-options/
+  if(MSVC)
+    # Elevate warning level.
+    # Ignore unknown pragmas.
+    target_compile_options(${TARGET_NAME} PRIVATE
+      /W4 /WX
+      /wd4068
+    )
+  else()
+    # Elevate warning level.
+    # Ignore unknown pragmas.
+    target_compile_options(${TARGET_NAME} PRIVATE
+      -Wall -Wextra -pedantic -Werror
+      -Wno-unknown-pragmas
+    )
+  endif()
+endfunction()
+
 # TODO: Demonstrate using static lib for modularity/testing.
 add_subdirectory(image_lib)
 # add_subdirectory(third-party/googletest)
@@ -165,15 +185,11 @@ foreach(RUBY_VERSION ${EXTENSION_RUBY_VERSIONS})
   # Third party libraries:
   target_link_libraries(${EXTENSION_LIB} PUBLIC ${SketchUpRuby_LIBRARY})
 
+  set_default_warnings(${EXTENSION_LIB})
+
+  # TODO: Wrap this into a utility function that can be re-used.
   # https://arne-mertz.de/2018/07/cmake-properties-options/
   if(MSVC)
-    # Elevate warning level.
-    # Ignore unknown pragmas (mac).
-    target_compile_options(${EXTENSION_LIB} PRIVATE
-      /W4 /WX
-      /wd4068
-    )
-
     # In SketchUp we found that when we upgraded from v140 toolkit, both v141
     # and v142 would yield random runtime crashes when `rb_raise` was called.
     # Not all locations of `rb_raise` would cause this, only some. We were not
@@ -224,13 +240,6 @@ foreach(RUBY_VERSION ${EXTENSION_RUBY_VERSIONS})
     # TODO:
     # target_link_libraries(${EXTENSION_LIB} ${SketchUpAPI_LIBRARY})
   else()
-    # Elevate warning level.
-    # Ignore unknown pragmas (win) and Ruby's usage of `register`.
-    target_compile_options(${EXTENSION_LIB} PRIVATE
-      -Wall -Wextra -pedantic -Werror
-      -Wno-unknown-pragmas -Wno-register
-    )
-
     # Ruby require the library to have .bundle extension on OSX.
     set_target_properties(${EXTENSION_LIB} PROPERTIES SUFFIX ".bundle" )
     # Remove the "lib" prefix as the name must match the Init_* function.
