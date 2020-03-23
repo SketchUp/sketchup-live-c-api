@@ -35,3 +35,7 @@ For those who prefer not to use CMake there is documentation for setting up the 
 * [XCode](docs/xcode.md)
 
 Visual Studio and Xcode is the main IDEs we work with. We welcome pull-requests if you want to contribute documentation for setting up your favorite editor.
+
+## See Also
+
+* [Using the Live C API](docs/using-live-c-api.md)
