@@ -124,5 +124,7 @@ function(set_default_warnings TARGET_NAME)
   endif()
 endfunction()
 
+find_package(SketchUpAPI 2019.3 REQUIRED)
+
 add_subdirectory(third-party/google-test)
 add_subdirectory(cext)

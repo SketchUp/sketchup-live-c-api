@@ -8,16 +8,33 @@ set(SOURCES
 # The tests themselves:
 set(TEST_SOURCES
   slapi/color_tests.cpp
-  # image_tests.cpp # TODO: Add tests.
+  image_tests.cpp
 )
 
 # TODO(Example): Set the name of the test binary here:
 set(TEST_APP_NAME image_lib_tests)
 
 add_executable(${TEST_APP_NAME} ${SOURCES} ${TEST_SOURCES})
-target_link_libraries(${TEST_APP_NAME} gtest_main gmock_main example_static)
+target_link_libraries(${TEST_APP_NAME}
+  gtest_main
+  gmock_main
+  example_static_test
+)
 target_include_directories(${TEST_APP_NAME} PRIVATE ${CMAKE_CURRENT_LIST_DIR})
 
 set_default_warnings(${TEST_APP_NAME})
 
 gtest_discover_tests(${TEST_APP_NAME})
+
+# TODO: Is there a better way to copy these depended files?
+# https://discourse.cmake.org/t/copying-dependent-dlls-to-executable-directory/852
+foreach(file_i ${SketchUpAPI_BINARIES})
+  add_custom_command(TARGET ${TEST_APP_NAME}
+    PRE_BUILD
+    COMMAND ${CMAKE_COMMAND}
+      ARGS -E copy ${file_i} ${CMAKE_CURRENT_BINARY_DIR}
+    COMMENT "Copy ${file_i} to ${CMAKE_CURRENT_BINARY_DIR} directory" VERBATIM
+)
+endforeach(file_i)
+
+# TODO: Verify test exe's link against standalone C API.

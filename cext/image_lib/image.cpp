@@ -8,7 +8,7 @@
 
 namespace example {
 
-bool CreateGreyScaleCopy(const SUImageRepRef input, SUImageRepRef output)
+bool GreyScaleCopy(const SUImageRepRef input, SUImageRepRef output, double amount)
 {
   if (SUIsInvalid(input) || SUIsInvalid(output)) {
     return false;
@@ -28,9 +28,10 @@ bool CreateGreyScaleCopy(const SUImageRepRef input, SUImageRepRef output)
   // color data to a byte buffer compatible with the platform specific order.
   std::vector<Color> greyscale(num_pixels);
   std::transform(begin(colors), end(colors), begin(greyscale),
-    [](const SUColor& color) -> Color {
+    [&amount](const SUColor& color) -> Color {
       const auto luminance = Luminance(color);
-      return { luminance, luminance, luminance, color.alpha };
+      const Color greyscale{ luminance, luminance, luminance, color.alpha };
+      return Blend(color, greyscale, amount);
     }
   );
 

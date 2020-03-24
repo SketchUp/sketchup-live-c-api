@@ -4,6 +4,6 @@
 
 namespace example {
 
-bool GreyScaleCopy(const SUImageRepRef input, SUImageRepRef output);
+bool GreyScaleCopy(const SUImageRepRef input, SUImageRepRef output, double amount);
 
 } // namespace example

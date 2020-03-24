@@ -1,14 +1,5 @@
-# TODO: Make a similar CMake module for the standalone version.
-# TODO: Create utility version to reuse logic for version lookup and search.
-#       Each module target different binaries.
-
-# TODO: Rename to LiveSketchUpAPI ?
-
 # https://cmake.org/cmake/help/latest/manual/cmake-packages.7.html
 # https://cmake.org/cmake/help/latest/manual/cmake-developer.7.html#manual:cmake-developer(7)
-
-# TODO: Imported Target
-# https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#imported-targets
 
 # ${SketchUpAPI_DIR}
 # ${SketchUpAPI_SEARCH_DIR}
@@ -101,14 +92,17 @@ foreach(_i RANGE 0 ${_range_max} ${_version_size})
 endforeach()
 
 if(WIN32)
-  set(_SketchUpAPI_LIBRARY_NAME "sketchup") # Live C API
+  set(_SketchUpAPI_LIBRARY_NAME "SketchUpAPI") # Standalone C API
+  set(_SketchUpAPI_LIVE_LIBRARY_NAME "sketchup") # Live C API
   set(_SketchUpAPI_LIBRARY_DIR ${_SketchUpAPI_DIR}/binaries/sketchup/x64)
   set(_SketchUpAPI_INCLUDE_DIR ${_SketchUpAPI_DIR}/headers)
 elseif(APPLE)
-  set(_SketchUpAPI_LIBRARY_NAME "SketchUpAPI")
+  set(_SketchUpAPI_LIBRARY_NAME "SketchUpAPI") # Standalone C API
+  set(_SketchUpAPI_LIVE_LIBRARY_NAME "SketchUpAPI") # Live C API (Don't link!)
   set(_SketchUpAPI_LIBRARY_DIR ${_SketchUpAPI_DIR})
   set(_SketchUpAPI_INCLUDE_DIR ${_SketchUpAPI_DIR})
 endif()
+set(_SketchUpAPI_COMMON_PREFERENCES_LIBRARY_NAME "SketchUpCommonPreferences")
 
 message(DEBUG "_SketchUpAPI_LIBRARY_DIR: ${_SketchUpAPI_LIBRARY_DIR}")
 message(DEBUG "_SketchUpAPI_INCLUDE_DIR: ${_SketchUpAPI_INCLUDE_DIR}")
@@ -116,7 +110,12 @@ message(DEBUG "_SketchUpAPI_INCLUDE_DIR: ${_SketchUpAPI_INCLUDE_DIR}")
 find_path(SketchUpAPI_INCLUDE_DIR "SketchUpAPI/sketchup.h"
   HINTS ${_SketchUpAPI_INCLUDE_DIR}
 )
+# Standalone C API
 find_library(SketchUpAPI_LIBRARY ${_SketchUpAPI_LIBRARY_NAME}
+  HINTS ${_SketchUpAPI_LIBRARY_DIR}
+)
+# Live C API
+find_library(SketchUpAPI_LIVE_LIBRARY ${_SketchUpAPI_LIVE_LIBRARY_NAME}
   HINTS ${_SketchUpAPI_LIBRARY_DIR}
 )
 
@@ -135,26 +134,55 @@ endif()
 mark_as_advanced(
   SketchUpAPI_INCLUDE_DIR
   SketchUpAPI_LIBRARY
+  SketchUpAPI_LIVE_LIBRARY
 )
 
 message(DEBUG "SketchUpAPI_LIBRARY: ${SketchUpAPI_LIBRARY}")
+message(DEBUG "SketchUpAPI_LIVE_LIBRARY: ${SketchUpAPI_LIVE_LIBRARY}")
 message(DEBUG "SketchUpAPI_INCLUDE_DIR: ${SketchUpAPI_INCLUDE_DIR}")
+message(DEBUG "SketchUpAPI_COMMON_PREFERENCES_LIBRARY: ${SketchUpAPI_COMMON_PREFERENCES_LIBRARY}")
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(SketchUpAPI
-  REQUIRED_VARS SketchUpAPI_LIBRARY SketchUpAPI_INCLUDE_DIR
-  VERSION_VAR SketchUpAPI_VERSION)
+  REQUIRED_VARS
+    SketchUpAPI_LIBRARY
+    SketchUpAPI_LIVE_LIBRARY
+    SketchUpAPI_INCLUDE_DIR
+  VERSION_VAR
+    SketchUpAPI_VERSION)
 
 if(SketchUpAPI_FOUND)
-  set(SketchUpAPI_LIBRARIES ${SketchUpAPI_LIBRARY})
+  set(SketchUpAPI_LIBRARIES ${SketchUpAPI_LIBRARY} ${SketchUpAPI_COMMON_PREFERENCES_LIBRARY})
+  set(SketchUpAPI_LIVE_LIBRARIES ${SketchUpAPI_LIVE_LIBRARY} ${SketchUpAPI_COMMON_PREFERENCES_LIBRARY})
   set(SketchUpAPI_INCLUDE_DIRS ${SketchUpAPI_INCLUDE_DIR})
+
+  # These DLLs needs to be loaded by the consumer of the standalone SketchUp C API.
+  if(WIN32)
+    set(SketchUpAPI_BINARIES
+      ${_SketchUpAPI_LIBRARY_DIR}/${_SketchUpAPI_LIBRARY_NAME}.dll
+      ${_SketchUpAPI_LIBRARY_DIR}/${_SketchUpAPI_COMMON_PREFERENCES_LIBRARY_NAME}.dll
+    )
+  endif()
 endif()
 
-  # https://cmake.org/cmake/help/latest/manual/cmake-developer.7.html#a-sample-find-module
+# https://cmake.org/cmake/help/latest/manual/cmake-developer.7.html#a-sample-find-module
+# https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#imported-targets
+# Professional CMake - Chapter 5.2.
 if(SketchUpAPI_FOUND AND NOT TARGET SketchUp::SketchUpAPI)
-  add_library(SketchUp::SketchUpAPI UNKNOWN IMPORTED)
+  # Standalone C API
+  add_library(SketchUp::SketchUpAPI SHARED IMPORTED)
   set_target_properties(SketchUp::SketchUpAPI PROPERTIES
     IMPORTED_LOCATION "${SketchUpAPI_LIBRARY}"
+    IMPORTED_IMPLIB "${SketchUpAPI_LIBRARY}"
+    INTERFACE_INCLUDE_DIRECTORIES "${SketchUpAPI_INCLUDE_DIR}"
+  )
+
+  # Live C API
+  # TODO: Can UNKNOWN be omitted?
+  # TODO: Mac should not link to the SketchUpAPI framework - only use include dir.
+  add_library(SketchUp::SketchUpLiveAPI UNKNOWN IMPORTED)
+  set_target_properties(SketchUp::SketchUpLiveAPI PROPERTIES
+    IMPORTED_LOCATION "${SketchUpAPI_LIVE_LIBRARY}"
     INTERFACE_INCLUDE_DIRECTORIES "${SketchUpAPI_INCLUDE_DIR}"
   )
 endif()

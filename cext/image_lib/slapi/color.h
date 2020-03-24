@@ -50,4 +50,6 @@ inline bool operator!=(const Color& lhs, const Color& rhs) {
 // Colorimetric conversion to greyscale.
 SUByte Luminance(const SUColor& color);
 
+Color Blend(const Color& color1, const Color& color2, double amount);
+
 } // namespace example

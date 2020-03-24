@@ -49,32 +49,6 @@ SUInstancePathRef GetRubyInstancePath(SUModelRef model, VALUE ruby_pid)
   return instance_path;
 }
 
-double Blend(double value1, double w1, double value2, double w2)
-{
-  return (value1 * w1) + (value2 * w2);
-}
-
-SUByte Blend(SUByte value1, double w1, double value2, double w2)
-{
-  double value = Blend(
-    static_cast<double>(value1), w1,
-    static_cast<double>(value2), w2
-  );
-  assert(value >= 0 && value <= 255); // Or explicitly clamp?
-  return static_cast<SUByte>(value);
-}
-
-Color Blend(const Color& color1, const Color& color2, double amount)
-{
-  const double w1 = amount;
-  const double w2 = 1.0 - amount;
-  SUByte red = Blend(color1.red, w1, color2.red, w2);
-  SUByte green = Blend(color1.green, w1, color2.green, w2);
-  SUByte blue = Blend(color1.blue, w1, color2.blue, w2);
-  SUByte alpha = Blend(color1.alpha, w1, color2.alpha, w2);
-  return { red, green, blue, alpha };
-}
-
 } // namespace
 
 
@@ -134,28 +108,31 @@ VALUE grey_scale(VALUE self, VALUE ruby_face_pid, VALUE ruby_amount, VALUE ruby_
   SU(SUImageRepCreate(&image_rep));
   SU(SUTextureGetColorizedImageRep(texture, &image_rep));
 
-  size_t data_size = 0, bits_per_pixel = 0;
-  SU(SUImageRepGetDataSize(image_rep, &data_size, &bits_per_pixel));
+  // size_t data_size = 0, bits_per_pixel = 0;
+  // SU(SUImageRepGetDataSize(image_rep, &data_size, &bits_per_pixel));
 
-  size_t width = 0, height = 0;
-  SU(SUImageRepGetPixelDimensions(image_rep, &width, &height));
+  // size_t width = 0, height = 0;
+  // SU(SUImageRepGetPixelDimensions(image_rep, &width, &height));
 
-  size_t num_pixels = width * height;
-  std::vector<SUColor> colors(num_pixels);
-  SU(SUImageRepGetDataAsColors(image_rep, colors.data()));
+  // size_t num_pixels = width * height;
+  // std::vector<SUColor> colors(num_pixels);
+  // SU(SUImageRepGetDataAsColors(image_rep, colors.data()));
 
-  // Note: using `Color` here and not `SUColor` as it helps in serializing the
-  // color data to a byte buffer compatible with the platform specific order.
-  std::vector<Color> result(num_pixels);
-  std::transform(begin(colors), end(colors), begin(result),
-    [&amount](const SUColor& color) -> Color {
-      const auto luminance = Luminance(color);
-      const Color greyscale{ luminance, luminance, luminance, color.alpha };
-      return Blend(color, greyscale, amount);
-    });
+  // // Note: using `Color` here and not `SUColor` as it helps in serializing the
+  // // color data to a byte buffer compatible with the platform specific order.
+  // std::vector<Color> result(num_pixels);
+  // std::transform(begin(colors), end(colors), begin(result),
+  //   [&amount](const SUColor& color) -> Color {
+  //     const auto luminance = Luminance(color);
+  //     const Color greyscale{ luminance, luminance, luminance, color.alpha };
+  //     return Blend(color, greyscale, amount);
+  //   });
 
-  auto buffer = reinterpret_cast<SUByte*>(result.data());
-  SU(SUImageRepSetData(image_rep, width, height, 32, 0, buffer));
+  // auto buffer = reinterpret_cast<SUByte*>(result.data());
+  // SU(SUImageRepSetData(image_rep, width, height, 32, 0, buffer));
+
+  auto success = GreyScaleCopy(image_rep, image_rep, amount);
+  if (!success) { return Qfalse; }
 
   SUStringRef filename_ref = SU_INVALID;
   SU(SUStringCreate(&filename_ref));

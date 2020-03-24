@@ -1,17 +1,16 @@
-find_package(SketchUpAPI 2019.3 REQUIRED)
-
 message(DEBUG PROJECT_SOURCE_DIR: ${PROJECT_SOURCE_DIR})
 message(DEBUG SketchUpAPI_INCLUDE_DIR: ${SketchUpAPI_INCLUDE_DIR})
 
 # https://gitlab.com/CLIUtils/modern-cmake/blob/master/examples/extended-project/src/CMakeLists.txt
 set(HEADER_LIST
-  slapi/utilities.h
   slapi/color.h
+  slapi/utilities.h
   image.h
   trace.h
 )
 set(SOURCES
   slapi/color.cpp
+  slapi/utilities.cpp
   image.cpp
   trace.cpp
 )
@@ -23,24 +22,23 @@ set(LIBRARY_NAME example_static)
 # standalone version of the C API since they don't run under SketchUp.
 set(TEST_LIBRARY_NAME ${LIBRARY_NAME}_test)
 
+# Create a library for Live C API usage:
 add_library(${LIBRARY_NAME} STATIC ${SOURCES} ${HEADER_LIST})
-# add_library(${TEST_LIBRARY_NAME} STATIC ${SOURCES} ${HEADER_LIST})
+# Create a library for Standalone C API usage (tests etc.):
+add_library(${TEST_LIBRARY_NAME} STATIC ${SOURCES} ${HEADER_LIST})
 
 # The projects include paths:
 target_include_directories(${LIBRARY_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR})
-# target_include_directories(${TEST_LIBRARY_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR})
+target_include_directories(${TEST_LIBRARY_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 
-# Third party include paths:
-# target_include_directories(${LIBRARY_NAME} PUBLIC ${SketchUpAPI_INCLUDE_DIR})
-
-target_link_libraries(${LIBRARY_NAME} SketchUp::SketchUpAPI)
-# target_link_libraries(${TEST_LIBRARY_NAME} SketchUp::SketchUpAPI) # #TODO: link against standalone
-# TODO: Build static lib for use in testing that links against standalone C API.
+# Link libraries:
+target_link_libraries(${LIBRARY_NAME} SketchUp::SketchUpLiveAPI)
+target_link_libraries(${TEST_LIBRARY_NAME} SketchUp::SketchUpAPI)
 
 # All users of this library will need at least C++17
-# TODO:
+# TODO: Other properties?
 target_compile_features(${LIBRARY_NAME} PUBLIC cxx_std_17)
-# target_compile_features(${TEST_LIBRARY_NAME} PUBLIC cxx_std_17)
+target_compile_features(${TEST_LIBRARY_NAME} PUBLIC cxx_std_17)
 
 # IDEs should put the headers in a nice place
 # TODO:
@@ -53,7 +51,7 @@ target_compile_features(${LIBRARY_NAME} PUBLIC cxx_std_17)
 # add_definitions(-DWIN32_LEAN_AND_MEAN -DNOMINMAX)
 
 set_default_warnings(${LIBRARY_NAME})
-# set_default_warnings(${TEST_LIBRARY_NAME})
+set_default_warnings(${TEST_LIBRARY_NAME})
 
 if(APPLE)
   # On Windows we must link to sketchup.lib to use the Live C API.
