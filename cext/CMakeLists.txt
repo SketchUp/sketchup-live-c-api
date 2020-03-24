@@ -57,17 +57,18 @@ foreach(RUBY_VERSION ${EXTENSION_RUBY_VERSIONS})
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${RUBY_VERSION}"
   )
 
+  # Generate version info header:
+  configure_file(example_config.h.in example_config.h)
+
   # Generate export header:
   # https://cmake.org/cmake/help/latest/module/GenerateExportHeader.html
   include("GenerateExportHeader")
-  # TODO: Set visibility?
   generate_export_header(${EXTENSION_LIB}
     BASE_NAME ${EXTENSION_NAME}
-    # EXPORT_MACRO_NAME ${EXTENSION_NAME}_EXPORTS
   )
 
   # Include path for CMake auto-generated files:
-  target_include_directories(${EXTENSION_LIB} PUBLIC ${CMAKE_BINARY_DIR})
+  target_include_directories(${EXTENSION_LIB} PUBLIC ${CMAKE_BINARY_DIR}/cext)
 
   # The projects include paths:
   target_include_directories(${EXTENSION_LIB} PUBLIC ${CMAKE_CURRENT_LIST_DIR})

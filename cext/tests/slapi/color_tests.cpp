@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 
-#include "slapi/color.hpp"
+#include "slapi/color.h"
 
 namespace example {
 

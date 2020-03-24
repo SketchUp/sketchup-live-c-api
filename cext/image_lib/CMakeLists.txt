@@ -5,10 +5,10 @@ message(DEBUG SketchUpAPI_INCLUDE_DIR: ${SketchUpAPI_INCLUDE_DIR})
 
 # https://gitlab.com/CLIUtils/modern-cmake/blob/master/examples/extended-project/src/CMakeLists.txt
 set(HEADER_LIST
-  slapi/utilities.hpp
-  slapi/color.hpp
-  image.hpp
-  trace.hpp
+  slapi/utilities.h
+  slapi/color.h
+  image.h
+  trace.h
 )
 set(SOURCES
   slapi/color.cpp

@@ -1,4 +1,4 @@
-#include "example_config.hpp"
+#include "example_config.h"
 #include "example_export.h"
 
 #include <array>
@@ -15,9 +15,9 @@
 #include "ruby/framework.h"
 #include "ruby/utilities.h"
 
-#include "slapi/color.hpp"
-#include "slapi/utilities.hpp"
-#include "image.hpp"
+#include "slapi/color.h"
+#include "slapi/utilities.h"
+#include "image.h"
 
 
 namespace example {

@@ -1,10 +1,10 @@
-#include "image.hpp"
+#include "image.h"
 
 #include <algorithm>
 #include <vector>
 
-#include "slapi/color.hpp"
-#include "slapi/utilities.hpp"
+#include "slapi/color.h"
+#include "slapi/utilities.h"
 
 namespace example {
 
