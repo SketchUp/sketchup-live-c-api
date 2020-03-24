@@ -13,4 +13,6 @@ TEST(ImageTest, InvalidInputBoth) {
   ASSERT_FALSE(result);
 }
 
+// TODO: Fill out tests.
+
 } // namespace example

@@ -32,6 +32,7 @@ SUByte Blend(SUByte value1, double w1, double value2, double w2)
 
 Color Blend(const Color& color1, const Color& color2, double amount)
 {
+  assert(amount >= 0.0 && amount <= 1.0);
   const double w1 = amount;
   const double w2 = 1.0 - amount;
   SUByte red = Blend(color1.red, w1, color2.red, w2);

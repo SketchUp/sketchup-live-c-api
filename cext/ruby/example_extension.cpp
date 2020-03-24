@@ -69,7 +69,7 @@ VALUE grey_scale(VALUE self, VALUE ruby_face_pid, VALUE ruby_amount, VALUE ruby_
     rb_raise(rb_eTypeError, "invalid model");
   }
 
-
+  // Face PID parameter
   SUInstancePathRef face_path = GetRubyInstancePath(model, ruby_face_pid);
 
   SUEntityRef entity = SU_INVALID;
@@ -81,13 +81,13 @@ VALUE grey_scale(VALUE self, VALUE ruby_face_pid, VALUE ruby_amount, VALUE ruby_
     rb_raise(rb_eTypeError, "invalid face references");
   }
 
-
+  //Amount parameter
   double amount = NUM2DBL(ruby_amount);
 
-
+  // Output path parameter
   std::string output_path(RSTRING_PTR(ruby_temp_path));
 
-
+  // Validate face parameter
   SUFaceRef face = SUFaceFromEntity(entity);
 
   SUMaterialRef material = SU_INVALID;
@@ -100,36 +100,13 @@ VALUE grey_scale(VALUE self, VALUE ruby_face_pid, VALUE ruby_amount, VALUE ruby_
     return Qnil;
   }
 
-
+  // Blend texture towards greyscale.
   SUTextureRef texture = SU_INVALID;
   SU(SUMaterialGetTexture(material, &texture));
 
   SUImageRepRef image_rep = SU_INVALID;
   SU(SUImageRepCreate(&image_rep));
   SU(SUTextureGetColorizedImageRep(texture, &image_rep));
-
-  // size_t data_size = 0, bits_per_pixel = 0;
-  // SU(SUImageRepGetDataSize(image_rep, &data_size, &bits_per_pixel));
-
-  // size_t width = 0, height = 0;
-  // SU(SUImageRepGetPixelDimensions(image_rep, &width, &height));
-
-  // size_t num_pixels = width * height;
-  // std::vector<SUColor> colors(num_pixels);
-  // SU(SUImageRepGetDataAsColors(image_rep, colors.data()));
-
-  // // Note: using `Color` here and not `SUColor` as it helps in serializing the
-  // // color data to a byte buffer compatible with the platform specific order.
-  // std::vector<Color> result(num_pixels);
-  // std::transform(begin(colors), end(colors), begin(result),
-  //   [&amount](const SUColor& color) -> Color {
-  //     const auto luminance = Luminance(color);
-  //     const Color greyscale{ luminance, luminance, luminance, color.alpha };
-  //     return Blend(color, greyscale, amount);
-  //   });
-
-  // auto buffer = reinterpret_cast<SUByte*>(result.data());
-  // SU(SUImageRepSetData(image_rep, width, height, 32, 0, buffer));
 
   auto success = GreyScaleCopy(image_rep, image_rep, amount);
   if (!success) { return Qfalse; }
