@@ -68,7 +68,7 @@ foreach(RUBY_VERSION ${EXTENSION_RUBY_VERSIONS})
   )
 
   # Include path for CMake auto-generated files:
-  target_include_directories(${EXTENSION_LIB} PUBLIC ${CMAKE_BINARY_DIR}/cext)
+  target_include_directories(${EXTENSION_LIB} PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 
   # The projects include paths:
   target_include_directories(${EXTENSION_LIB} PUBLIC ${CMAKE_CURRENT_LIST_DIR})
