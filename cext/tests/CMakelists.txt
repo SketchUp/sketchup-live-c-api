@@ -1,5 +1,3 @@
-# Based on "Professional CMake" Chapter 24.9
-
 include(GoogleTest)
 
 # Helper files for the tests:
@@ -9,9 +7,8 @@ set(SOURCES
 
 # The tests themselves:
 set(TEST_SOURCES
-  test_slapi_color.cpp
-  test_slapi_utilities.cpp
-  test_image.cpp
+  slapi/color_tests.cpp
+  # image_tests.cpp
 )
 
 # TODO(Example): Set the name of the test binary here:

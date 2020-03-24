@@ -124,7 +124,5 @@ function(set_default_warnings TARGET_NAME)
   endif()
 endfunction()
 
-# TODO: Demonstrate using static lib for modularity/testing.
-add_subdirectory(cext)
 add_subdirectory(third-party/google-test)
-# add_subdirectory(tests)
+add_subdirectory(cext)

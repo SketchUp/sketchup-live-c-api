@@ -1,4 +1,5 @@
 add_subdirectory(image_lib)
+add_subdirectory(tests)
 
 find_package(SketchUpRuby 2019.0 REQUIRED)
 # TODO: Can we import selected targets from Find Modules?
@@ -150,5 +151,10 @@ foreach(RUBY_VERSION ${EXTENSION_RUBY_VERSIONS})
   )
   # TODO: Clean extension cext directory for anything except the stage directory.
   # https://cmake.org/cmake/help/latest/command/install.html#custom-installation-logic
+
+  # TODO: Windows: Verify linking to sketchup.exe and not SketchUpAPI.dll
+  # dumpbin example.so /DEPENDENTS
+  # TODO: macOS: Verify linking to sketchup.exe and not SketchUpAPI.dll
+  # ...
 
 endforeach() # EXTENSION_RUBY_VERSIONS
