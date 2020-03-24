@@ -8,7 +8,7 @@ set(SOURCES
 # The tests themselves:
 set(TEST_SOURCES
   slapi/color_tests.cpp
-  # image_tests.cpp
+  # image_tests.cpp # TODO: Add tests.
 )
 
 # TODO(Example): Set the name of the test binary here:

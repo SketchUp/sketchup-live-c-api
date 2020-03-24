@@ -121,6 +121,7 @@ find_library(SketchUpAPI_LIBRARY ${_SketchUpAPI_LIBRARY_NAME}
 )
 
 if(APPLE)
+    # TODO: Pick path based on requested version.
     # TODO: Search multiple version paths
     # TODO: Make this requred var on macOS?
     # TODO: Can the logic of setting this on the target that links to it be
