@@ -126,5 +126,14 @@ endfunction()
 
 find_package(SketchUpAPI 2019.3 REQUIRED)
 
+# TODO: Restructure folders:
+# * cext/image_lib
+# * cext/ruby_extension
+# * cext/tests
+#
+# add_subdirectory(third-party/google-test)
+# add_subdirectory(cext/image_lib)
+# add_subdirectory(cext/ruby_extension)
+# add_subdirectory(cext/tests)
 add_subdirectory(third-party/google-test)
 add_subdirectory(cext)
