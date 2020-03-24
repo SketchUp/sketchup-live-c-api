@@ -124,6 +124,7 @@ function(set_default_warnings TARGET_NAME)
   endif()
 endfunction()
 
+# Find the SketchUp C API SDK package:
 find_package(SketchUpAPI 2019.3 REQUIRED)
 
 # TODO: Restructure folders:
