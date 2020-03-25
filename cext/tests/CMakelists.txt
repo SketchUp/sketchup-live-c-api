@@ -34,7 +34,12 @@ foreach(file_i ${SketchUpAPI_BINARIES})
     COMMAND ${CMAKE_COMMAND}
       ARGS -E copy ${file_i} ${CMAKE_CURRENT_BINARY_DIR}
     COMMENT "Copy ${file_i} to ${CMAKE_CURRENT_BINARY_DIR} directory" VERBATIM
-)
+  )
 endforeach(file_i)
 
-# TODO: Verify test exe's link against standalone C API.
+# Verify test exe's link against standalone C API.
+validate_dependencies(${TEST_APP_NAME}
+  $<TARGET_FILE:${TEST_APP_NAME}>
+  SketchUpAPI.dll
+  sketchup.exe
+)

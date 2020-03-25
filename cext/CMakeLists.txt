@@ -137,6 +137,13 @@ foreach(RUBY_VERSION ${EXTENSION_RUBY_VERSIONS})
     set_target_properties(${EXTENSION_LIB} PROPERTIES PREFIX "" )
   endif()
 
+  # Verify targets link against live C API.
+  validate_dependencies(${EXTENSION_LIB}
+    $<TARGET_FILE:${EXTENSION_LIB}>
+    sketchup.exe
+    SketchUpAPI.dll
+  )
+
 
   set(EXTENSION_DIR ${PROJECT_SOURCE_DIR}/src)
   set(EXTENSION_STAGE_DIR ${EXTENSION_DIR}/example/cext/stage)
