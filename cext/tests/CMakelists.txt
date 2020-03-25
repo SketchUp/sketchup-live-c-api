@@ -12,13 +12,13 @@ set(TEST_SOURCES
 )
 
 # TODO(Example): Set the name of the test binary here:
-set(TEST_APP_NAME image_lib_tests)
+set(TEST_APP_NAME imagelib_tests)
 
 add_executable(${TEST_APP_NAME} ${SOURCES} ${TEST_SOURCES})
 target_link_libraries(${TEST_APP_NAME}
   gtest_main
   gmock_main
-  example_static_test
+  imagelib_test_static
 )
 target_include_directories(${TEST_APP_NAME} PRIVATE ${CMAKE_CURRENT_LIST_DIR})
 

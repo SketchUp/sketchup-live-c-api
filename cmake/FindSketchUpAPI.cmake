@@ -169,6 +169,10 @@ endif()
 # https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#imported-targets
 # Professional CMake - Chapter 5.2.
 if(SketchUpAPI_FOUND AND NOT TARGET SketchUp::SketchUpAPI)
+  if(APPLE)
+    set(SketchUpAPI_LIBRARY "${SketchUpAPI_LIBRARY}/${_SketchUpAPI_LIBRARY_NAME}")
+  endif()
+
   # Standalone C API
   add_library(SketchUp::SketchUpAPI SHARED IMPORTED)
   set_target_properties(SketchUp::SketchUpAPI PROPERTIES
@@ -180,9 +184,29 @@ if(SketchUpAPI_FOUND AND NOT TARGET SketchUp::SketchUpAPI)
   # Live C API
   # TODO: Can UNKNOWN be omitted?
   # TODO: Mac should not link to the SketchUpAPI framework - only use include dir.
-  add_library(SketchUp::SketchUpLiveAPI UNKNOWN IMPORTED)
-  set_target_properties(SketchUp::SketchUpLiveAPI PROPERTIES
-    IMPORTED_LOCATION "${SketchUpAPI_LIVE_LIBRARY}"
-    INTERFACE_INCLUDE_DIRECTORIES "${SketchUpAPI_INCLUDE_DIR}"
-  )
+  if(WIN32)
+    # On Windows we must link to sketchup.lib to use the Live C API.
+    add_library(SketchUp::SketchUpLiveAPI UNKNOWN IMPORTED)
+    set_target_properties(SketchUp::SketchUpLiveAPI PROPERTIES
+      IMPORTED_LOCATION "${SketchUpAPI_LIVE_LIBRARY}"
+      INTERFACE_INCLUDE_DIRECTORIES "${SketchUpAPI_INCLUDE_DIR}"
+    )
+  elseif(APPLE)
+    # TODO: Can this be SHARED?
+    # TODO: Can INTERFACE be used on Windows as well?
+    #       Just omit IMPORTED_LOCATION on mac.
+    add_library(SketchUp::SketchUpLiveAPI INTERFACE IMPORTED)
+    set_target_properties(SketchUp::SketchUpLiveAPI PROPERTIES
+      INTERFACE_INCLUDE_DIRECTORIES "${SketchUpAPI_INCLUDE_DIR}"
+    )
+    # Since we aren't linking to the SketchUpAPI.framework we must set the
+    # bundle loader to a version of SketchUp.
+    # NOTE: This doesn't lock the compiled binary to this SketchUp version, it's
+    #       only needed during linking. The only requirement is that the version
+    #       used support the SLAPI features used.
+    target_link_options(SketchUp::SketchUpLiveAPI INTERFACE
+      LINKER:-bundle -bundle_loader ${SketchUpAPI_BUNDLE_LOADER}
+    )
+    # TODO: Check @executable_path etc...
+  endif()
 endif()

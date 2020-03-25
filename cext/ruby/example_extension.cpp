@@ -24,13 +24,6 @@ namespace example {
 namespace ruby {
 namespace {
 
-VALUE new_ruby_image_rep() {
-  static VALUE mSketchup = rb_define_module("Sketchup");
-  static VALUE cImageRep = rb_const_get(mSketchup, rb_intern("ImageRep"));
-  VALUE image_rep = rb_class_new_instance(0, nullptr, cImageRep);
-  return image_rep;
-}
-
 SUInstancePathRef GetRubyInstancePath(SUModelRef model, VALUE ruby_pid)
 {
   Check_Type(ruby_pid, T_STRING);

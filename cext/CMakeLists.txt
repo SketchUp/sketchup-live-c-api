@@ -42,7 +42,7 @@ foreach(RUBY_VERSION ${EXTENSION_RUBY_VERSIONS})
     add_library(${EXTENSION_LIB} SHARED ${SOURCES})
   endif()
 
-  target_link_libraries(${EXTENSION_LIB} PRIVATE example_static)
+  target_link_libraries(${EXTENSION_LIB} PRIVATE imagelib_static)
 
   # Need to correct the names since the name of each library for each Ruby
   # version is exactly the same. By default CMake uses the CMake target name

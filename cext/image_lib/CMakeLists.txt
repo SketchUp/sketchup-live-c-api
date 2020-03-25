@@ -17,10 +17,12 @@ set(SOURCES
 source_group(TREE ${CMAKE_CURRENT_LIST_DIR} FILES ${SOURCES} ${HEADER_LIST})
 
 # TODO(Example): Set static library name here:
-set(LIBRARY_NAME example_static)
+set(LIBRARY_BASE_NAME imagelib)
+# This is the library name for the library linking against the Live C API.
+set(LIBRARY_NAME ${LIBRARY_BASE_NAME}_static)
 # This is a static lib used for unit tests - which must link against the
 # standalone version of the C API since they don't run under SketchUp.
-set(TEST_LIBRARY_NAME ${LIBRARY_NAME}_test)
+set(TEST_LIBRARY_NAME ${LIBRARY_BASE_NAME}_test_static)
 
 # Create a library for Live C API usage:
 add_library(${LIBRARY_NAME} STATIC ${SOURCES} ${HEADER_LIST})
@@ -54,17 +56,13 @@ set_default_warnings(${LIBRARY_NAME})
 set_default_warnings(${TEST_LIBRARY_NAME})
 
 if(APPLE)
-  # On Windows we must link to sketchup.lib to use the Live C API.
-  # TODO: Isn't this linking against SketchUpAPI.lib? (standalone API)
-  # target_link_libraries(${LIBRARY_NAME} ${SketchUpAPI_LIBRARY})
-
   # Since we aren't linking to the SketchUpAPI.framework we must set the
   # bundle loader to a version of SketchUp.
   # NOTE: This doesn't lock the compiled binary to this SketchUp version, it's
   #       only needed during linking. The only requirement is that the version
   #       used support the SLAPI features used.
   # TODO: Can this be performed by the find-module?
-  target_link_options(${LIBRARY_NAME} PUBLIC
-    LINKER:-bundle -bundle_loader ${SketchUpAPI_BUNDLE_LOADER}
-  )
+  # target_link_options(${LIBRARY_NAME} PUBLIC
+  #   LINKER:-bundle -bundle_loader ${SketchUpAPI_BUNDLE_LOADER}
+  # )
 endif()
