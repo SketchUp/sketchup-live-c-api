@@ -13,7 +13,7 @@
 #include <SketchUpAPI/sketchup.h>
 
 #include "ruby/framework.h"
-#include "ruby/utilities.h"
+#include "utilities.h"
 
 #include "slapi/color.h"
 #include "slapi/utilities.h"

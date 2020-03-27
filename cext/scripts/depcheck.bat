@@ -28,3 +28,5 @@ IF NOT %expected%==pass (
   ECHO Unexpected dependency %4 found in %2 1>&2
   EXIT /B 1
 )
+
+ECHO Passed!

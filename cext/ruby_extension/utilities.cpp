@@ -1,4 +1,4 @@
-#include "ruby/utilities.h"
+#include "utilities.h"
 
 // #include <sstream>
 

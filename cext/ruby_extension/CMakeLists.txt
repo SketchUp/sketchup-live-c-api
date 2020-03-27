@@ -1,6 +1,3 @@
-add_subdirectory(image_lib)
-add_subdirectory(tests)
-
 find_package(SketchUpRuby 2019.0 REQUIRED)
 # TODO: Can we import selected targets from Find Modules?
 # https://cmake.org/cmake/help/latest/manual/cmake-developer.7.html#find-modules
@@ -13,8 +10,8 @@ find_package(SketchUpRuby 2019.0 REQUIRED)
 # the source tree.
 # https://cmake.org/cmake/help/latest/command/file.html#filesystem
 set(SOURCES
-  ruby/example_extension.cpp
-  ruby/utilities.cpp
+  example_extension.cpp
+  utilities.cpp
 )
 
 # TODO(Example): Name your extension here. This will be the filename of the
