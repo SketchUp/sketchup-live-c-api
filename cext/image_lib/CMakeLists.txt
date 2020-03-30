@@ -29,13 +29,25 @@ add_library(${LIBRARY_NAME} STATIC ${SOURCES} ${HEADER_LIST})
 # Create a library for Standalone C API usage (tests etc.):
 add_library(${TEST_LIBRARY_NAME} STATIC ${SOURCES} ${HEADER_LIST})
 
+# Link private libraries:
+target_link_libraries(${LIBRARY_NAME} PRIVATE
+  project_warnings
+)
+target_link_libraries(${TEST_LIBRARY_NAME} PRIVATE
+  project_warnings
+)
+
+# Link public libraries:
+target_link_libraries(${LIBRARY_NAME} PUBLIC
+  SketchUp::SketchUpLiveAPI
+)
+target_link_libraries(${TEST_LIBRARY_NAME} PUBLIC
+  SketchUp::SketchUpAPI
+)
+
 # The projects include paths:
 target_include_directories(${LIBRARY_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 target_include_directories(${TEST_LIBRARY_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR})
-
-# Link libraries:
-target_link_libraries(${LIBRARY_NAME} SketchUp::SketchUpLiveAPI)
-target_link_libraries(${TEST_LIBRARY_NAME} SketchUp::SketchUpAPI)
 
 # All users of this library will need at least C++17
 # TODO: Other properties?
@@ -51,9 +63,6 @@ target_compile_features(${TEST_LIBRARY_NAME} PUBLIC cxx_std_17)
 
 # Avoid global pollution from Windows API.
 # add_definitions(-DWIN32_LEAN_AND_MEAN -DNOMINMAX)
-
-set_default_warnings(${LIBRARY_NAME})
-set_default_warnings(${TEST_LIBRARY_NAME})
 
 if(APPLE)
   # Since we aren't linking to the SketchUpAPI.framework we must set the

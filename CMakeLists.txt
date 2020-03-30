@@ -51,6 +51,11 @@ if(WIN32)
   add_definitions(-DWIN32_LEAN_AND_MEAN -DNOMINMAX)
 endif()
 
+# Link this 'library' to use the warnings specified in ProjectWarnings.cmake.
+add_library(project_warnings INTERFACE)
+include(cmake/ProjectWarnings.cmake)
+set_project_warnings(project_warnings)
+
 # https://stackoverflow.com/a/50469013/486990
 # https://gitlab.kitware.com/cmake/community/wikis/doc/ctest/Testing-With-CTest
 include(CTest)
@@ -103,28 +108,6 @@ set(gtest_force_shared_crt OFF CACHE BOOL "" FORCE)
 
 # Don't want to install GoogleTest.
 set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
-
-# TODO: Move the utility functions to their own files.
-
-# Utility function to set base warning properties.
-function(set_default_warnings TARGET_NAME)
-  # https://arne-mertz.de/2018/07/cmake-properties-options/
-  if(MSVC)
-    # Elevate warning level.
-    # Ignore unknown pragmas.
-    target_compile_options(${TARGET_NAME} PRIVATE
-      /W4 /WX
-      /wd4068
-    )
-  else()
-    # Elevate warning level.
-    # Ignore unknown pragmas.
-    target_compile_options(${TARGET_NAME} PRIVATE
-      -Wall -Wextra -pedantic -Werror
-      -Wno-unknown-pragmas
-    )
-  endif()
-endfunction()
 
 # Find the SketchUp C API SDK package:
 find_package(SketchUpAPI 2019.3 REQUIRED)
