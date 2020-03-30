@@ -135,6 +135,7 @@ foreach(RUBY_VERSION ${EXTENSION_RUBY_VERSIONS})
   endif()
 
   # Verify targets link against live C API.
+  include("DependencyTools")
   validate_dependencies(${EXTENSION_LIB}
     $<TARGET_FILE:${EXTENSION_LIB}>
     sketchup.exe
