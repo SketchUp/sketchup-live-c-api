@@ -16,25 +16,25 @@
     {
       // https://code.visualstudio.com/docs/cpp/launch-json-reference
       // https://vector-of-bool.github.io/docs/vscode-cmake-tools/debugging.html
-      "name": "CMake MSVC Launch",
+      "name": "Debug CMake Target (MSVC)",
       "type": "cppvsdbg",
       "request": "launch",
       // Resolved by CMake Tools:
       "program": "${command:cmake.launchTargetPath}",
       "args": [
-        "--gtest_filter=TraceMapTest.TracePolygonsOnePolygon"
+        // "--gtest_filter=ColorTest.*"
       ],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",
     },
     {
-      "name": "(msvc) Launch SU2019",
+      "name": "Debug Ruby C++ Extension (msvc)",
       "type": "cppvsdbg",
       "request": "launch",
-      "program": "C:/Program Files/SketchUp/SketchUp 2019/SketchUp.exe",
+      "program": "C:/Program Files/SketchUp/SketchUp ${input:sketchupVersion}/SketchUp.exe",
       "args": [
         "-RubyStartup",
-        "${workspaceFolder}\\cext\\debug.rb",
+        "${workspaceFolder}\\cext\\scripts\\debug.rb",
         "-RubyStartupArg",
         "${input:buildType}"
       ],
@@ -44,29 +44,13 @@
       "externalConsole": false
     },
     {
-      "name": "(msvc) Launch SU2020",
-      "type": "cppvsdbg",
-      "request": "launch",
-      "program": "C:/Program Files/SketchUp/SketchUp 2020/SketchUp.exe",
-      "args": [
-        "-RubyStartup",
-        "${workspaceFolder}\\cext\\debug.rb",
-        "-RubyStartupArg",
-        "${input:buildType}"
-      ],
-      "stopAtEntry": false,
-      "cwd": "${workspaceFolder}",
-      "environment": [],
-      "externalConsole": false
-    },
-    {
-      "name": "(clang) Launch",
+      "name": "Debug Ruby C++ Extension (clang)",
       "type": "cppdbg",
       "request": "launch",
-      "program": "/Applications/SketchUp 2020/SketchUp.app/Contents/MacOS/SketchUp",
+      "program": "/Applications/SketchUp ${input:sketchupVersion}/SketchUp.app/Contents/MacOS/SketchUp",
       "args": [
         "-RubyStartup",
-        "${workspaceFolder}/cext/debug.rb",
+        "${workspaceFolder}/cext/scripts/debug.rb",
         "-RubyStartupArg",
         "${input:buildType}"
       ],
@@ -93,6 +77,16 @@
         "Debug"
       ],
       "default": "Debug"
+    },
+    {
+      "id": "sketchupVersion",
+      "type": "pickString",
+      "description": "SketchUp Version",
+      "options": [
+        "2020",
+        "2019"
+      ],
+      "default": "2020"
     }
   ]
 }

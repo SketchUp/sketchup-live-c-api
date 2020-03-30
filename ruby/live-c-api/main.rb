@@ -2,10 +2,15 @@ require 'sketchup.rb'
 
 require 'tempfile'
 
-require_relative '../../cext/build/Debug/2.5/example'
-
 module Examples
   module LiveCAPI
+
+    puts "Loading C Extension" # Debug
+    if defined?(Examples::LiveCAPI::CEXT_VERSION)
+      puts "#{self.name} C Extension already loaded"
+    else
+      require 'live-c-api/cext/2.5/example'
+    end
 
     class Failure < StandardError; end
 

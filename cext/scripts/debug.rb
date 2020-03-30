@@ -6,8 +6,10 @@ module Examples
     puts "Debugging #{self.name.split('::').last} (#{CEXT_BUILD_TYPE})"
 
     ruby_version = RUBY_VERSION.split('.').take(2).join('.')
-    bin_path = File.join(__dir__, 'build', CEXT_BUILD_TYPE, ruby_version)
-    cext = File.join(bin_path, 'example')
+    bin_path = File.join(__dir__, '..', 'build', CEXT_BUILD_TYPE, ruby_version)
+    cext = File.expand_path('example', bin_path)
+
+    puts "Loading: #{cext}"
 
     require cext
 

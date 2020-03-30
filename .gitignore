@@ -4,3 +4,10 @@ third-party/slapi/**/*
 
 # CMake
 cext/build/
+
+# Binaries
+*.so
+*.bundle
+
+# Bundler
+Gemfile.lock

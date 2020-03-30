@@ -4,7 +4,7 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Debug in SketchUp 2020",
+      "label": "Launch SketchUp 2020 in Ruby Debug mode",
       "type": "shell",
       "command": "skippy",
       "args": [
@@ -19,9 +19,11 @@
       "windows": {
         "command": "xcopy",
         "args": [
-          "${workspaceFolder}\\cext\\build\\release\\traceup.so",
-          "${workspaceFolder}\\src\\tt_traceup\\cext\\stage\\2.5\\",
-          "/Y"
+          "${workspaceFolder}\\cext\\build\\Release\\2.5\\example.so",
+          "${workspaceFolder}\\ruby\\live-c-api\\cext\\2.5\\",
+          "/Y", // /Y - Suppresses prompting to overwrite an existing file(s)
+          "/I", // /I - Assumes that destination is directory (but must ends with \)
+          "/F" // /F - Displays full source & target file names
         ]
       },
       "problemMatcher": []
