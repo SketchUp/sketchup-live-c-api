@@ -123,10 +123,6 @@ foreach(RUBY_VERSION ${EXTENSION_RUBY_VERSIONS})
     # https://cmake.org/cmake/help/v3.0/command/set_target_properties.html
     # https://cmake.org/cmake/help/latest/command/set_target_properties.html
     set_target_properties(${EXTENSION_LIB} PROPERTIES SUFFIX ".so" )
-
-    # On Windows we must link to sketchup.lib to use the Live C API.
-    # TODO:
-    # target_link_libraries(${EXTENSION_LIB} ${SketchUpAPI_LIBRARY})
   else()
     # Ruby require the library to have .bundle extension on OSX.
     set_target_properties(${EXTENSION_LIB} PROPERTIES SUFFIX ".bundle" )
@@ -138,8 +134,8 @@ foreach(RUBY_VERSION ${EXTENSION_RUBY_VERSIONS})
   include("DependencyTools")
   validate_dependencies(${EXTENSION_LIB}
     $<TARGET_FILE:${EXTENSION_LIB}>
-    sketchup.exe
-    SketchUpAPI.dll
+    EXPECTED sketchup.exe
+    UNEXPECTED SketchUpAPI.dll
   )
 
 

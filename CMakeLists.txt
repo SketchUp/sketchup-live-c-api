@@ -6,13 +6,31 @@
 # https://gitlab.kitware.com/cmake/cmake/issues/19084
 cmake_minimum_required(VERSION 3.15.4)
 
+# Validate platform.
+if(NOT (WIN32 OR APPLE))
+  message(FATAL_ERROR "This project only works on Windows or macOS.")
+endif()
+
 # SketchUp 2019.0 supports macOS 10.12 and newer.
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.12" CACHE STRING "Minimum OS X deployment version")
+
+# https://cmake.org/cmake/help/latest/guide/tutorial/index.html
+# TODO(Example): Name your project:
+project(Example VERSION 0.1.0 LANGUAGES CXX C)
+
+# Specify the list of directories to search for cmake modules.
+# https://cliutils.gitlab.io/modern-cmake/chapters/basics/structure.html
+set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 
 # https://crascit.com/2015/03/28/enabling-cxx11-in-cmake/
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+
+# Hide symbols by default.
+# https://cmake.org/cmake/help/latest/module/GenerateExportHeader.html
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+set(CMAKE_VISIBILITY_INLINES_HIDDEN YES)
 
 # Since SketchUp extensions are created to run against multiple SketchUp
 # versions CRT dependency can be a pain if using dynamic linking.
@@ -24,24 +42,6 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # To simplify this, build the Ruby C Extension with static CRT.
 # Set here to apply as default for all targets.
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-
-# Validate platform.
-if(NOT (WIN32 OR APPLE))
-  message(FATAL_ERROR "This project only works on Windows or macOS.")
-endif()
-
-# https://cmake.org/cmake/help/latest/guide/tutorial/index.html
-# TODO(Example): Name your project:
-project(Example VERSION 0.1.0 LANGUAGES CXX C)
-
-# Specify the list of directories to search for cmake modules.
-# https://cliutils.gitlab.io/modern-cmake/chapters/basics/structure.html
-set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
-
-# Hide symbols by default.
-# https://cmake.org/cmake/help/latest/module/GenerateExportHeader.html
-set(CMAKE_CXX_VISIBILITY_PRESET hidden)
-set(CMAKE_VISIBILITY_INLINES_HIDDEN YES)
 
 # Set some Windows only properties.
 if(WIN32)
