@@ -1,7 +1,5 @@
 # Utility function to validate dependencies.
 function(validate_dependencies TARGET_NAME BINARY_FILE)
-  # TODO: Make EXPECTED and UNEXPECT named arguments.
-
   # Define the supported set of keywords.
   set(noValues "")
   set(singleValues EXPECTED UNEXPECTED)

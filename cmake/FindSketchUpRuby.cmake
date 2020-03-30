@@ -4,8 +4,6 @@
 
 # https://cmake.org/cmake/help/latest/manual/cmake-packages.7.html
 # https://cmake.org/cmake/help/latest/manual/cmake-developer.7.html#manual:cmake-developer(7)
-
-# TODO: Imported Target
 # https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#imported-targets
 
 set(SketchUpRuby_VERSION "2019.0")
@@ -143,11 +141,6 @@ find_package_handle_standard_args(SketchUpRuby
     SketchUpRuby_250_LIBRARY SketchUpRuby_250_INCLUDE_DIR
   VERSION_VAR
     SketchUpRuby_VERSION)
-
-# if(SketchUpRuby_FOUND)
-#   set(SketchUpRuby_LIBRARIES ${SketchUpRuby_LIBRARY})
-#   set(SketchUpRuby_INCLUDE_DIRS ${SketchUpRuby_INCLUDE_DIR})
-# endif()
 
 # https://cmake.org/cmake/help/latest/manual/cmake-developer.7.html#a-sample-find-module
 if(SketchUpRuby_FOUND AND NOT TARGET SketchUp::SketchUpRuby)
