@@ -2,40 +2,34 @@
 
 namespace example {
 
-#ifdef __APPLE__
+#ifdef _WIN32
 
-// http://stackoverflow.com/a/1644898/486990
-// http://stackoverflow.com/a/1306690/486990
+  // Must disable the min/max macros defined by windows.h to avoid conflict with
+  // std::max and std:min.
+  // http://stackoverflow.com/a/2789509/486990
+  #ifndef NOMINMAX
+  #define NOMINMAX
+  #endif
 
-bool _trace(...);
-#define __noop do {} while (0)
+  #include <windows.h>
 
-#define TRACE(...) __noop
+  #ifdef _DEBUG
+    bool _trace(LPTSTR format, ...);
+    #define TRACE _trace
+  #else
+    #define TRACE __noop
+  #endif
 
-#else // #ifdef __APPLE__
+#else
 
-// Must disable the min/max macros defined by windows.h to avoid conflict with
-// std::max and std:min.
-// http://stackoverflow.com/a/2789509/486990
-#ifndef NOMINMAX
-#define NOMINMAX
+  // http://stackoverflow.com/a/1644898/486990
+  // http://stackoverflow.com/a/1306690/486990
+
+  bool _trace(...);
+  #define __noop do {} while (0)
+
+  #define TRACE(...) __noop
+
 #endif
-
-#include <windows.h>
-
-
-#ifdef _DEBUG
-
-bool _trace(LPTSTR format, ...);
-#define TRACE _trace
-
-#else // #ifdef _DEBUG
-
-#define TRACE __noop
-
-#endif // #ifdef _DEBUG
-
-
-#endif // #ifdef __APPLE__
 
 } // namespace example

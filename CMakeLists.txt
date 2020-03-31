@@ -51,6 +51,11 @@ if(WIN32)
   add_definitions(-DWIN32_LEAN_AND_MEAN -DNOMINMAX)
 endif()
 
+# Link this 'library' to use the options specified in ProjectOptions.cmake.
+add_library(project_options INTERFACE)
+include(cmake/ProjectOptions.cmake)
+set_project_options(project_options)
+
 # Link this 'library' to use the warnings specified in ProjectWarnings.cmake.
 add_library(project_warnings INTERFACE)
 include(cmake/ProjectWarnings.cmake)

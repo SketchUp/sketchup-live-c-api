@@ -27,5 +27,8 @@ function(validate_dependencies TARGET_NAME BINARY_FILE)
         ${DUMPBIN} ${BINARY_FILE} ${ARG_EXPECTED} ${ARG_UNEXPECTED}
       COMMENT "Validate dependencies of ${BINARY_FILE}>" VERBATIM
     )
+  else()
+    # TODO: Add macOS support.
+    message(WARNING "Unable to validate dependencies: Unsupported compiler.")
   endif()
 endfunction()

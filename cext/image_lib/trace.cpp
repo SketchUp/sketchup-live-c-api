@@ -2,39 +2,33 @@
 
 namespace example {
 
-// TODO: Change to detect Windows instead.
-#ifdef __APPLE__
+#ifdef _WIN32
 
+  #include <Strsafe.h>
 
-bool _trace(...)
-{
-  return false;
-}
+  #ifdef _DEBUG
+    bool _trace(LPTSTR format, ...)
+    {
+      TCHAR buffer[1000];
 
+      va_list argptr;
+      va_start(argptr, format);
+      StringCchVPrintf(buffer, 1000, format, argptr);
+      va_end(argptr);
 
-#else // #ifdef __APPLE__
+      OutputDebugString(buffer);
 
+      return true;
+    }
+  #endif
 
-#include <Strsafe.h>
+#else // #ifndef _WIN32
 
+  bool _trace(...)
+  {
+    return false;
+  }
 
-#ifdef _DEBUG
-bool _trace(LPTSTR format, ...)
-{
-  TCHAR buffer[1000];
-
-  va_list argptr;
-  va_start(argptr, format);
-  StringCchVPrintf(buffer, 1000, format, argptr);
-  va_end(argptr);
-
-  OutputDebugString(buffer);
-
-  return true;
-}
 #endif
-
-
-#endif // #ifndef __APPLE__
 
 } // namespace example
