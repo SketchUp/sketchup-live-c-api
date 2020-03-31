@@ -41,7 +41,6 @@ function(add_ruby_extension_library
   )
 
   # Generate export header:
-  # https://cmake.org/cmake/help/latest/module/GenerateExportHeader.html
   set_target_properties(${EXTENSION_LIB} PROPERTIES
     DEFINE_SYMBOL "${EXTENSION_NAME}_EXPORTS"
   )
@@ -72,7 +71,6 @@ function(add_ruby_extension_library
   # Third party libraries:
   target_link_libraries(${EXTENSION_LIB} PUBLIC ${SketchUpRuby_LIBRARY})
 
-  # https://arne-mertz.de/2018/07/cmake-properties-options/
   if(MSVC)
     # In SketchUp we found that when we upgraded from v140 toolkit, both v141
     # and v142 would yield random runtime crashes when `rb_raise` was called.
@@ -114,12 +112,12 @@ function(add_ruby_extension_library
     #
     # https://docs.microsoft.com/en-us/cpp/cpp/using-setjmp-longjmp?view=vs-2019
     target_compile_options(${EXTENSION_LIB} PRIVATE /EHs)
+  endif()
 
+  if(WIN32)
     # Ruby require the library to have .so extension on Windows.
-    # https://cmake.org/cmake/help/v3.0/command/set_target_properties.html
-    # https://cmake.org/cmake/help/latest/command/set_target_properties.html
     set_target_properties(${EXTENSION_LIB} PROPERTIES SUFFIX ".so" )
-  else()
+  elseif(APPLE)
     # Ruby require the library to have .bundle extension on OSX.
     set_target_properties(${EXTENSION_LIB} PROPERTIES SUFFIX ".bundle" )
     # Remove the "lib" prefix as the name must match the Init_* function.
