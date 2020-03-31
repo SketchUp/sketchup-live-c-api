@@ -5,10 +5,17 @@ find_package(SketchUpRuby 2019.0 REQUIRED)
 # CMake recommends not using GLOB to collect a list of source files from
 # the source tree.
 # https://cmake.org/cmake/help/latest/command/file.html#filesystem
+set(HEADERS
+  ruby/framework.h
+  utilities.h
+)
 set(SOURCES
   example_extension.cpp
   utilities.cpp
 )
+
+source_group(TREE ${CMAKE_CURRENT_LIST_DIR} PREFIX "Header Files" FILES ${HEADERS})
+source_group(TREE ${CMAKE_CURRENT_LIST_DIR} PREFIX "Source Files" FILES ${SOURCES})
 
 # TODO(Example): Name your extension here. This will be the filename of the
 # binaries:
@@ -25,7 +32,7 @@ foreach(RUBY_VERSION ${EXTENSION_RUBY_VERSIONS})
   add_ruby_extension_library(
     ${EXTENSION_NAME} EXTENSION_LIB
     ${RUBY_VERSION} SketchUpRuby_LIBRARY
-    "${SOURCES}"
+    "${HEADERS};${SOURCES}"
   )
 
   target_link_libraries(${EXTENSION_LIB} PRIVATE
@@ -42,8 +49,5 @@ foreach(RUBY_VERSION ${EXTENSION_RUBY_VERSIONS})
     RUNTIME DESTINATION ${CMAKE_CURRENT_LIST_DIR}/bin/$<CONFIG>/${RUBY_VERSION}
     LIBRARY DESTINATION ${CMAKE_CURRENT_LIST_DIR}/bin/$<CONFIG>/${RUBY_VERSION}
   )
-
-  # TODO: Clean extension cext directory for anything except the stage directory.
-  # https://cmake.org/cmake/help/latest/command/install.html#custom-installation-logic
 
 endforeach() # EXTENSION_RUBY_VERSIONS

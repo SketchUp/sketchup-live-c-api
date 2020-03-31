@@ -15,9 +15,8 @@ set(SOURCES
   trace.cpp
 )
 
-# TODO: Verify
-source_group(TREE ${CMAKE_CURRENT_LIST_DIR} PREFIX "Headers" FILES ${HEADERS})
-source_group(TREE ${CMAKE_CURRENT_LIST_DIR} PREFIX "Sources" FILES ${SOURCES})
+source_group(TREE ${CMAKE_CURRENT_LIST_DIR} PREFIX "Header Files" FILES ${HEADERS})
+source_group(TREE ${CMAKE_CURRENT_LIST_DIR} PREFIX "Source Files" FILES ${SOURCES})
 
 # TODO(Example): Set static library name here:
 set(LIBRARY_BASE_NAME imagelib)
@@ -28,9 +27,9 @@ set(LIBRARY_NAME ${LIBRARY_BASE_NAME}_static)
 set(TEST_LIBRARY_NAME ${LIBRARY_BASE_NAME}_test_static)
 
 # Create a library for Live C API usage:
-add_library(${LIBRARY_NAME} STATIC ${SOURCES} ${HEADERS})
+add_library(${LIBRARY_NAME} STATIC ${HEADERS} ${SOURCES})
 # Create a library for Standalone C API usage (tests etc.):
-add_library(${TEST_LIBRARY_NAME} STATIC ${SOURCES} ${HEADERS})
+add_library(${TEST_LIBRARY_NAME} STATIC ${HEADERS} ${SOURCES})
 
 # Link private libraries:
 target_link_libraries(${LIBRARY_NAME} PRIVATE
