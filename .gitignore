@@ -2,8 +2,12 @@
 third-party/slapi/**/*
 !third-party/slapi/*.md
 
-# CMake
+# CMake (VSCode)
 cext/build/
+
+# CMake (Visual Studio)
+.vs/
+out/
 
 # Binaries
 *.so
