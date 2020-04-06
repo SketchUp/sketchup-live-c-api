@@ -117,6 +117,154 @@ VALUE grey_scale(VALUE self, VALUE ruby_face_pid, VALUE ruby_amount, VALUE ruby_
 }
 
 
+////////////////////////////////////////////////////////////////////////////////
+
+SUModelRef GetActiveModel() {
+  SUModelRef model = SU_INVALID;
+  SU(SUApplicationGetActiveModel(&model));
+  if (SUIsInvalid(model)) {
+    rb_raise(rb_eTypeError, "invalid model");
+  }
+  return model;
+}
+
+SUSelectionRef GetSelection() {
+  SUModelRef model = GetActiveModel();
+  SUSelectionRef selection = SU_INVALID;
+  SUModelGetSelection(model, &selection);
+  return selection;
+}
+
+std::vector<SUDrawingElementRef> GetRubyDrawingElements(VALUE elements) {
+  SUModelRef model = GetActiveModel();
+
+  Check_Type(elements, T_ARRAY);
+  auto num_elements = RARRAY_LEN(elements);
+
+  std::vector<int64_t> pids;
+  pids.reserve(num_elements);
+
+  static ID id_pid = rb_intern("persistent_id ");
+  auto elements_ptr = RARRAY_PTR(elements);
+  for (long i = 0; i < num_elements; ++i) {
+    VALUE element = elements_ptr[i];
+    VALUE ruby_pid = rb_funcall2(element, id_pid, 0, nullptr);
+    int64_t pid = NUM2LL(ruby_pid);
+    pids.push_back(pid);
+  }
+
+  std::vector<SUEntityRef> entities(num_elements, SU_INVALID);
+  SUModelGetEntitiesByPersistentIDs(model, num_elements, pids.data(), entities.data());
+
+  std::vector<SUDrawingElementRef> list(num_elements, SU_INVALID);
+  std::transform(entities.begin(), entities.end(), list.begin(),
+    [](const SUEntityRef& entity) {
+      return SUDrawingElementFromEntity(entity);
+    });
+
+  return list;
+}
+
+VALUE selection_add(VALUE self, VALUE elements) {
+  auto ref_elements = GetRubyDrawingElements(elements);
+  auto selection = GetSelection();
+  SUSelectionAdd(selection, ref_elements.size(), ref_elements.data());
+  return Qnil;
+}
+
+VALUE selection_remove(VALUE self, VALUE elements) {
+  auto ref_elements = GetRubyDrawingElements(elements);
+  auto selection = GetSelection();
+  SUSelectionRemove(selection, ref_elements.size(), ref_elements.data());
+  return Qnil;
+}
+
+VALUE selection_toggle(VALUE self, VALUE elements) {
+  auto ref_elements = GetRubyDrawingElements(elements);
+  auto selection = GetSelection();
+  SUSelectionToggle(selection, ref_elements.size(), ref_elements.data());
+  return Qnil;
+}
+
+VALUE selection_clear(VALUE self) {
+  auto selection = GetSelection();
+  SUSelectionClear(selection);
+  return Qnil;
+}
+
+VALUE selection_invert(VALUE self) {
+  auto selection = GetSelection();
+  SUSelectionInvert(selection);
+  return Qnil;
+}
+
+VALUE selection_is_curve(VALUE self) {
+  auto selection = GetSelection();
+  bool is_curve = false;
+  SUSelectionIsCurve(selection, &is_curve);
+  return GetVALUE(is_curve);
+}
+
+VALUE selection_is_surface(VALUE self) {
+  auto selection = GetSelection();
+  bool is_surface = false;
+  SUSelectionIsSurface(selection, &is_surface);
+  return GetVALUE(is_surface);
+}
+
+VALUE selection_is_object(VALUE self) {
+  auto selection = GetSelection();
+  bool is_object = false;
+  SUSelectionIsSingleObject(selection, &is_object);
+  return GetVALUE(is_object);
+}
+
+VALUE selection_size(VALUE self) {
+  auto selection = GetSelection();
+  bool size = false;
+  SUSelectionGetNumElements(selection, &size);
+  return GetVALUE(size);
+}
+
+VALUE selection_to_a(VALUE self) {
+  auto selection = GetSelection();
+
+  SUEntityListRef list = SU_INVALID;
+  SUEntityListCreate(&list);
+  SUSelectionGetEntityList(selection, list);
+
+  size_t len = 0;
+  SUEntityListSize(list, &len);
+
+  VALUE pids = rb_ary_new_capa(len);
+
+  SUEntityListIteratorRef it = SU_INVALID;
+  SUEntityListIteratorCreate(&it);
+
+  SUEntityRef entity = SU_INVALID;
+  SUEntityListBegin(list, &it);
+
+  while(SUEntityListIteratorGetEntity(it, &entity) == SU_ERROR_NONE) {
+    int64_t pid = 0;
+    SUEntityGetPersistentID(entity, &pid);
+    VALUE ruby_pid = LL2NUM(pid);
+    rb_ary_push(pids, ruby_pid);
+
+    SUEntityListIteratorNext(it);
+  }
+
+  SUEntityListIteratorRelease(&it);
+  SUEntityListRelease(&list);
+
+  VALUE mSketchup = rb_const_get(rb_cObject, rb_intern("Sketchup"));
+  VALUE active_model = rb_funcall(mSketchup, rb_intern("active_model"), 0, nullptr);
+  VALUE ruby_entities = rb_funcall(active_model, rb_intern("find_entity_by_persistent_id"), 1, pids);
+
+  return ruby_entities;
+}
+
+
+
 #pragma clang diagnostic pop
 #pragma warning (pop)
 
@@ -137,6 +285,19 @@ EXAMPLE_EXPORT void Init_example()
 
   rb_define_module_function(mLiveCAPI, "grey_scale",
       VALUEFUNC(grey_scale), 3);
+
+
+  VALUE mSelection = rb_define_module_under(mLiveCAPI, "Selection");
+  rb_define_module_function(mSelection, "add", VALUEFUNC(selection_add), 1);
+  rb_define_module_function(mSelection, "remove", VALUEFUNC(selection_remove), 1);
+  rb_define_module_function(mSelection, "toggle", VALUEFUNC(selection_toggle), 1);
+  rb_define_module_function(mSelection, "clear", VALUEFUNC(selection_clear), 0);
+  rb_define_module_function(mSelection, "invert", VALUEFUNC(selection_invert), 0);
+  rb_define_module_function(mSelection, "curve?", VALUEFUNC(selection_is_curve), 0);
+  rb_define_module_function(mSelection, "surface?", VALUEFUNC(selection_is_surface), 0);
+  rb_define_module_function(mSelection, "object?", VALUEFUNC(selection_is_object), 0);
+  rb_define_module_function(mSelection, "size", VALUEFUNC(selection_size), 0);
+  rb_define_module_function(mSelection, "to_a", VALUEFUNC(selection_to_a), 0);
 }
 
 } // extern "C"
