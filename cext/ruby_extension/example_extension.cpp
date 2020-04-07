@@ -144,7 +144,7 @@ std::vector<SUDrawingElementRef> GetRubyDrawingElements(VALUE elements) {
   std::vector<int64_t> pids;
   pids.reserve(num_elements);
 
-  static ID id_pid = rb_intern("persistent_id ");
+  static ID id_pid = rb_intern("persistent_id");
   auto elements_ptr = RARRAY_PTR(elements);
   for (long i = 0; i < num_elements; ++i) {
     VALUE element = elements_ptr[i];
@@ -295,7 +295,7 @@ EXAMPLE_EXPORT void Init_example()
   rb_define_module_function(mSelection, "invert", VALUEFUNC(selection_invert), 0);
   rb_define_module_function(mSelection, "curve?", VALUEFUNC(selection_is_curve), 0);
   rb_define_module_function(mSelection, "surface?", VALUEFUNC(selection_is_surface), 0);
-  rb_define_module_function(mSelection, "object?", VALUEFUNC(selection_is_object), 0);
+  rb_define_module_function(mSelection, "single_object?", VALUEFUNC(selection_is_object), 0);
   rb_define_module_function(mSelection, "size", VALUEFUNC(selection_size), 0);
   rb_define_module_function(mSelection, "to_a", VALUEFUNC(selection_to_a), 0);
 }
