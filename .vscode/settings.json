@@ -13,6 +13,9 @@
     // https://github.com/microsoft/vscode-cmake-tools/issues/892
     // "--log-level=DEBUG" // Enable to get more info from CMake.
   ],
+  "cmake.configureSettings": {
+    "SketchUpAPI_DIR": "${workspaceRoot}/../../SLAPI/SDK_2020.1_develop"
+  },
   "catch2TestExplorer.executables":[
     {
       "name": "${filename}",

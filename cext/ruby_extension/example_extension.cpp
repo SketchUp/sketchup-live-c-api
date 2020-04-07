@@ -221,7 +221,7 @@ VALUE selection_is_object(VALUE self) {
 
 VALUE selection_size(VALUE self) {
   auto selection = GetSelection();
-  bool size = false;
+  size_t size = false;
   SUSelectionGetNumElements(selection, &size);
   return GetVALUE(size);
 }
@@ -236,7 +236,7 @@ VALUE selection_to_a(VALUE self) {
   size_t len = 0;
   SUEntityListSize(list, &len);
 
-  VALUE pids = rb_ary_new_capa(len);
+  VALUE pids = rb_ary_new_capa(static_cast<long>(len));
 
   SUEntityListIteratorRef it = SU_INVALID;
   SUEntityListIteratorCreate(&it);
