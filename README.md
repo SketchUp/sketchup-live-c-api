@@ -11,7 +11,7 @@ This is a guide demonstrating how to setup and build your own Ruby C extension t
 
 ## General Instructions
 
-`<SDK_PATH>` is the location where the SDK package is unpackages.
+`<SDK_PATH>` is the location where the SDK package is extracted.
 
 ### Windows
 
