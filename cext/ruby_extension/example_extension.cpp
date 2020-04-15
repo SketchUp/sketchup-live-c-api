@@ -223,7 +223,7 @@ VALUE selection_size(VALUE self) {
   auto selection = GetSelection();
   size_t size = false;
   SUSelectionGetNumElements(selection, &size);
-  return GetVALUE(size);
+  return SIZET2NUM(size);
 }
 
 VALUE selection_to_a(VALUE self) {
@@ -257,7 +257,7 @@ VALUE selection_to_a(VALUE self) {
   SUEntityListRelease(&list);
 
   VALUE mSketchup = rb_const_get(rb_cObject, rb_intern("Sketchup"));
-  VALUE active_model = rb_funcall(mSketchup, rb_intern("active_model"), 0, nullptr);
+  VALUE active_model = rb_funcall(mSketchup, rb_intern("active_model"), 0, NULL);
   VALUE ruby_entities = rb_funcall(active_model, rb_intern("find_entity_by_persistent_id"), 1, pids);
 
   return ruby_entities;
