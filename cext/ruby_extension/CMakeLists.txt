@@ -50,6 +50,7 @@ foreach(RUBY_VERSION ${EXTENSION_RUBY_VERSIONS})
     LIBRARY DESTINATION ${CMAKE_CURRENT_LIST_DIR}/bin/$<CONFIG>/${RUBY_VERSION}
   )
 
+  # Copy binaries into the Ruby extension's path.
   install(TARGETS ${EXTENSION_LIB}
     RUNTIME DESTINATION ${PROJECT_SOURCE_DIR}/ruby/live-c-api/cext/${RUBY_VERSION}
     LIBRARY DESTINATION ${PROJECT_SOURCE_DIR}/ruby/live-c-api/cext/${RUBY_VERSION}
