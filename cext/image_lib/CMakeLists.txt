@@ -52,15 +52,3 @@ target_link_libraries(${TEST_LIBRARY_NAME} PUBLIC
 # The projects include paths:
 target_include_directories(${LIBRARY_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 target_include_directories(${TEST_LIBRARY_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR})
-
-if(APPLE)
-  # Since we aren't linking to the SketchUpAPI.framework we must set the
-  # bundle loader to a version of SketchUp.
-  # NOTE: This doesn't lock the compiled binary to this SketchUp version, it's
-  #       only needed during linking. The only requirement is that the version
-  #       used support the SLAPI features used.
-  # TODO: Can this be performed by the find-module?
-  # target_link_options(${LIBRARY_NAME} PUBLIC
-  #   LINKER:-bundle -bundle_loader ${SketchUpAPI_BUNDLE_LOADER}
-  # )
-endif()
