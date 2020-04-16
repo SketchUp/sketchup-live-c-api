@@ -4,7 +4,6 @@
 #include <array>
 #include <algorithm>
 #include <cassert>
-#include <filesystem>
 #include <functional>
 #include <string>
 #include <string_view>
