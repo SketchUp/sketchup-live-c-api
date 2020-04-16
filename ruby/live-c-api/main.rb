@@ -70,6 +70,7 @@ module Examples
         puts "Live C API Selection: #{method_name} (#{faces.size} faces)"
         p Examples::LiveCAPI::Selection.send(method_name, faces)
       }
+      cmd.tooltip = cmd.menu_text
       toolbar.add_item(cmd)
     end
 
@@ -78,6 +79,7 @@ module Examples
         puts "Live C API Selection: #{method_name}"
         p Examples::LiveCAPI::Selection.send(method_name)
       }
+      cmd.tooltip = cmd.menu_text
       toolbar.add_item(cmd)
     end
 
@@ -89,16 +91,16 @@ module Examples
       }
 
       toolbar = UI::Toolbar.new("Live C API - Selection")
-      add_selection_test_with_param(:add)
-      add_selection_test_with_param(:remove)
-      add_selection_test_with_param(:toggle)
-      add_selection_test(:invert)
-      add_selection_test(:clear)
-      add_selection_test(:size)
-      add_selection_test(:to_a)
-      add_selection_test(:curve?)
-      add_selection_test(:surface?)
-      add_selection_test(:single_object?)
+      add_selection_test_with_param(toolbar, :add)
+      add_selection_test_with_param(toolbar, :remove)
+      add_selection_test_with_param(toolbar, :toggle)
+      add_selection_test(toolbar, :invert)
+      add_selection_test(toolbar, :clear)
+      add_selection_test(toolbar, :size)
+      add_selection_test(toolbar, :to_a)
+      add_selection_test(toolbar, :curve?)
+      add_selection_test(toolbar, :surface?)
+      add_selection_test(toolbar, :single_object?)
 
       file_loaded(__FILE__)
     end
