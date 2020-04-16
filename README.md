@@ -1,5 +1,30 @@
 # SketchUp Live C API Examples
 
+--------------------------------------------------------------------------------
+
+## Live C API Testing: SUSelectionRef
+
+The following snippets can be used to test the `SUSelectionRef` functionality.
+
+Grab references to some entities and manipulate the selection.
+
+```ruby
+faces = Sketchup.active_model.entities.grep(Sketchup::Face)
+
+Examples::LiveCAPI::Selection.add(faces)
+Examples::LiveCAPI::Selection.remove(faces)
+Examples::LiveCAPI::Selection.toggle(faces)
+Examples::LiveCAPI::Selection.invert(faces)
+Examples::LiveCAPI::Selection.clear(faces)
+Examples::LiveCAPI::Selection.size
+Examples::LiveCAPI::Selection.to_a
+Examples::LiveCAPI::Selection.curve?
+Examples::LiveCAPI::Selection.surface?
+Examples::LiveCAPI::Selection.single_object?
+```
+
+--------------------------------------------------------------------------------
+
 The [SketchUp C API](https://extensions.sketchup.com/sketchup-sdk) is mainly used for the following:
 
 * Read/Write `.skp` files in applications other than SketchUp.
