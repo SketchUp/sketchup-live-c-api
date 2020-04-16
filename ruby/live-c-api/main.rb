@@ -63,12 +63,43 @@ module Examples
       UI.messagebox(error.message)
     end
 
+    def self.add_selection_test_with_param(toolbar, method_name)
+      cmd = UI::Command.new("Selection #{method_name}") {
+        model = Sketchup.active_model
+        faces = model.active_entities.grep(Sketchup::Face)
+        puts "Live C API Selection: #{method_name} (#{faces.size} faces)"
+        p Examples::LiveCAPI::Selection.send(method_name, faces)
+      }
+      toolbar.add_item(cmd)
+    end
+
+    def self.add_selection_test(toolbar, method_name)
+      cmd = UI::Command.new("Selection #{method_name}") {
+        puts "Live C API Selection: #{method_name}"
+        p Examples::LiveCAPI::Selection.send(method_name)
+      }
+      toolbar.add_item(cmd)
+    end
+
     unless file_loaded?(__FILE__)
       menu = UI.menu('Plugins')
       sub_menu = menu.add_submenu('Live C API Examples')
       sub_menu.add_item('Greyscale') {
         self.blend_to_greyscale
       }
+
+      toolbar = UI::Toolbar.new("Live C API - Selection")
+      add_selection_test_with_param(:add)
+      add_selection_test_with_param(:remove)
+      add_selection_test_with_param(:toggle)
+      add_selection_test(:invert)
+      add_selection_test(:clear)
+      add_selection_test(:size)
+      add_selection_test(:to_a)
+      add_selection_test(:curve?)
+      add_selection_test(:surface?)
+      add_selection_test(:single_object?)
+
       file_loaded(__FILE__)
     end
 
