@@ -141,21 +141,40 @@ find_library(SketchUpAPI_LIVE_LIBRARY ${_SketchUpAPI_LIVE_LIBRARY_NAME}
 )
 
 if(APPLE)
-    # TODO: Pick path based on requested version.
-    # TODO: Search multiple version paths
-    # TODO: Make this requred var on macOS?
-    # TODO: Can the logic of setting this on the target that links to it be
-    #       done here in this module?
-    set(SketchUpAPI_BUNDLE_LOADER
-      "/Applications/SketchUp 2019/SketchUp.app/Contents/MacOS/SketchUp"
-      CACHE PATH "Bundle Loader"
-    )
+  # Allow the bundle loader to be explicitly set. This is needed if
+  # is set SketchUpAPI_DIR since it is then not possible to infer package
+  # version.
+  if(DEFINED SketchUpAPI_BUNDLE_LOADER OR DEFINED ENV{SketchUpAPI_BUNDLE_LOADER})
+    # If an explicit path has been set, use that.
+    if (DEFINED ENV{SketchUpAPI_BUNDLE_LOADER})
+      set(SketchUpAPI_BUNDLE_LOADER $ENV{SketchUpAPI_BUNDLE_LOADER})
+    endif()
+    message(STATUS "Using explicit SketchUpAPI bundle loader: ${SketchUpAPI_BUNDLE_LOADER}")
+    if(NOT EXISTS ${SketchUpAPI_BUNDLE_LOADER})
+      message(FATAL_ERROR "Unable to find bundle loader: ${SketchUpAPI_BUNDLE_LOADER}")
+    endif()
+
+  else()
+    # Pick path based on requested version.
+    string(REPLACE "." ";" _SketchUpAPI_VERSION_COMPONENTS ${SketchUpAPI_VERSION})
+    list(GET _SketchUpAPI_VERSION_COMPONENTS 0 _SketchUpAPI_VERSION_MAJOR)
+    list(GET _SketchUpAPI_VERSION_COMPONENTS 1 _SketchUpAPI_VERSION_MINOR)
+    set(_SketchUpAPI_PATH_SketchUpAPIFFIX "SketchUp ${_SketchUpAPI_VERSION_MAJOR}")
+    unset(_SketchUpAPI_APP CACHE)
+    find_program(SketchUpAPI_BUNDLE_LOADER "SketchUp" PATH_SUFFIXES ${_SketchUpAPI_PATH_SUFFIX})
+    # TODO: Search multiple version paths?
+    # TODO: Make this part of REQUIRED_VARS on macOS?
+    if(NOT EXISTS ${SketchUpAPI_BUNDLE_LOADER})
+      message(FATAL_ERROR "Unable to find bundle loader: ${SketchUpAPI_BUNDLE_LOADER}")
+    endif()
+  endif()
 endif()
 
 mark_as_advanced(
   SketchUpAPI_INCLUDE_DIR
   SketchUpAPI_LIBRARY
   SketchUpAPI_LIVE_LIBRARY
+  SketchUpAPI_BUNDLE_LOADER
 )
 
 message(DEBUG "SketchUpAPI_LIBRARY: ${SketchUpAPI_LIBRARY}")
