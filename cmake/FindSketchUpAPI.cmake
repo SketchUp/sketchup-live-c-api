@@ -34,62 +34,83 @@ set(_version_size 3) # Size of the version arrays.
 LIST(LENGTH _SketchUpAPIs _length)
 MATH(EXPR _range_max "(${_version_size}*${_num_versions})-1")
 
-foreach(_i RANGE 0 ${_range_max} ${_version_size})
-  list(SUBLIST _SketchUpAPIs ${_i} ${_version_size} _SketchUpAPI)
-  message(DEBUG "i: ${_i}, length: ${_length}, range_max: ${_range_max}")
-  message(DEBUG ${_SketchUpAPI})
+message(DEBUG "SketchUpAPI_DIR: ${SketchUpAPI_DIR}")
+message(DEBUG "SketchUpAPI_DIR (ENV): $ENV{SketchUpAPI_DIR}")
 
-  list(GET _SketchUpAPI 0 _SketchUpAPI_VERSION)
-  list(GET _SketchUpAPI 1 _SketchUpAPI_WIN_DIR)
-  list(GET _SketchUpAPI 2 _SketchUpAPI_MAC_DIR)
+message("SketchUpAPI_DIR: ${SketchUpAPI_DIR}")
+message("SketchUpAPI_DIR (ENV): $ENV{SketchUpAPI_DIR}")
 
-  if(WIN32)
-    set(_SketchUpAPI_BASENAME_DIR ${_SketchUpAPI_WIN_DIR})
-    elseif(APPLE)
-    set(_SketchUpAPI_BASENAME_DIR ${_SketchUpAPI_MAC_DIR})
+if(DEFINED SketchUpAPI_DIR OR DEFINED ENV{SketchUpAPI_DIR})
+  # If an explicit path has been set, use that.
+  if (DEFINED SketchUpAPI_DIR)
+    get_filename_component(_SketchUpAPI_DIR ${SketchUpAPI_DIR} REALPATH)
   else()
-    message(FATAL_ERROR "SketchUpAPI is only available on Win/Mac")
+    get_filename_component(_SketchUpAPI_DIR $ENV{SketchUpAPI_DIR} REALPATH)
   endif()
+  message(STATUS "Using explicit SketchUpAPI directory path: ${_SketchUpAPI_DIR}")
+  # Don't know how to infer a version if not based on the official filenames.
+  message(STATUS "Unknown SketchUpAPI package version")
 
-  # TODO: Rename to SketchUpAPI_SEARCH_PATH?
-  message(DEBUG "SketchUpAPI_SEARCH_DIR: ${SketchUpAPI_SEARCH_DIR}")
-  message(DEBUG "ENV SketchUpAPI_SEARCH_DIR: $ENV{SketchUpAPI_SEARCH_DIR}")
-  message(DEBUG "_SketchUpAPI_BASENAME_DIR: ${_SketchUpAPI_BASENAME_DIR}")
+else() # Otherwise, search for a location.
 
-  find_file(_SketchUpAPI_DIR
-    NAMES
-      ${_SketchUpAPI_BASENAME_DIR}
-    HINTS
-      ${SketchUpAPI_SEARCH_DIR}
-      $ENV{SketchUpAPI_SEARCH_DIR}
-  )
-  message(DEBUG "_SketchUpAPI_DIR: ${_SketchUpAPI_DIR}")
+  foreach(_i RANGE 0 ${_range_max} ${_version_size})
+    list(SUBLIST _SketchUpAPIs ${_i} ${_version_size} _SketchUpAPI)
+    message(DEBUG "i: ${_i}, length: ${_length}, range_max: ${_range_max}")
+    message(DEBUG ${_SketchUpAPI})
 
-  if(NOT IS_DIRECTORY ${_SketchUpAPI_DIR})
-    continue()
-  endif()
+    list(GET _SketchUpAPI 0 _SketchUpAPI_VERSION)
+    list(GET _SketchUpAPI 1 _SketchUpAPI_WIN_DIR)
+    list(GET _SketchUpAPI 2 _SketchUpAPI_MAC_DIR)
 
-  if(SketchUpAPI_FIND_VERSION_EXACT)
-    set(_SketchUpAPI_VERSION_COMPARE "VERSION_EQUAL")
-  else()
-    set(_SketchUpAPI_VERSION_COMPARE "VERSION_GREATER_EQUAL")
-  endif()
+    if(WIN32)
+      set(_SketchUpAPI_BASENAME_DIR ${_SketchUpAPI_WIN_DIR})
+      elseif(APPLE)
+      set(_SketchUpAPI_BASENAME_DIR ${_SketchUpAPI_MAC_DIR})
+    else()
+      message(FATAL_ERROR "SketchUpAPI is only available on Win/Mac")
+    endif()
 
-  if(SketchUpAPI_FIND_VERSION_EXACT)
-    if(NOT PACKAGE_FIND_VERSION VERSION_EQUAL ${_SketchUpAPI_VERSION})
+    # TODO: Rename to SketchUpAPI_SEARCH_PATH?
+    message(DEBUG "SketchUpAPI_SEARCH_DIR: ${SketchUpAPI_SEARCH_DIR}")
+    message(DEBUG "ENV SketchUpAPI_SEARCH_DIR: $ENV{SketchUpAPI_SEARCH_DIR}")
+    message(DEBUG "_SketchUpAPI_BASENAME_DIR: ${_SketchUpAPI_BASENAME_DIR}")
+
+    find_file(_SketchUpAPI_DIR
+      NAMES
+        ${_SketchUpAPI_BASENAME_DIR}
+      HINTS
+        ${SketchUpAPI_SEARCH_DIR}
+        $ENV{SketchUpAPI_SEARCH_DIR}
+    )
+    message(DEBUG "_SketchUpAPI_DIR: ${_SketchUpAPI_DIR}")
+
+    if(NOT IS_DIRECTORY ${_SketchUpAPI_DIR})
       continue()
     endif()
-  else()
-    if(NOT PACKAGE_FIND_VERSION VERSION_GREATER_EQUAL ${_SketchUpAPI_VERSION})
-      continue()
+
+    if(SketchUpAPI_FIND_VERSION_EXACT)
+      set(_SketchUpAPI_VERSION_COMPARE "VERSION_EQUAL")
+    else()
+      set(_SketchUpAPI_VERSION_COMPARE "VERSION_GREATER_EQUAL")
     endif()
-  endif()
 
-  set(SketchUpAPI_DIR ${_SketchUpAPI_DIR})
-  set(SketchUpAPI_VERSION ${_SketchUpAPI_VERSION})
-  break()
+    if(SketchUpAPI_FIND_VERSION_EXACT)
+      if(NOT PACKAGE_FIND_VERSION VERSION_EQUAL ${_SketchUpAPI_VERSION})
+        continue()
+      endif()
+    else()
+      if(NOT PACKAGE_FIND_VERSION VERSION_GREATER_EQUAL ${_SketchUpAPI_VERSION})
+        continue()
+      endif()
+    endif()
 
-endforeach()
+    set(SketchUpAPI_DIR ${_SketchUpAPI_DIR})
+    set(SketchUpAPI_VERSION ${_SketchUpAPI_VERSION})
+    break()
+
+  endforeach()
+
+endif()
 
 if(WIN32)
   set(_SketchUpAPI_LIBRARY_NAME "SketchUpAPI") # Standalone C API
