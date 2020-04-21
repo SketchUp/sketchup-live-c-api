@@ -6,6 +6,8 @@
 # $ENV{SketchUpAPI_DIR}
 # $ENV{SketchUpAPI_SEARCH_DIR}
 
+message(DEBUG "FindSketchUpAPI")
+
 set(_SketchUpAPI_2020_0
   2020.0
   SDK_WIN_x64_2020-0-363
@@ -37,9 +39,6 @@ MATH(EXPR _range_max "(${_version_size}*${_num_versions})-1")
 message(DEBUG "SketchUpAPI_DIR: ${SketchUpAPI_DIR}")
 message(DEBUG "SketchUpAPI_DIR (ENV): $ENV{SketchUpAPI_DIR}")
 
-message("SketchUpAPI_DIR: ${SketchUpAPI_DIR}")
-message("SketchUpAPI_DIR (ENV): $ENV{SketchUpAPI_DIR}")
-
 if(DEFINED SketchUpAPI_DIR OR DEFINED ENV{SketchUpAPI_DIR})
   # If an explicit path has been set, use that.
   if (DEFINED SketchUpAPI_DIR)
@@ -55,20 +54,24 @@ else() # Otherwise, search for a location.
 
   foreach(_i RANGE 0 ${_range_max} ${_version_size})
     list(SUBLIST _SketchUpAPIs ${_i} ${_version_size} _SketchUpAPI)
+    message(DEBUG "")
     message(DEBUG "i: ${_i}, length: ${_length}, range_max: ${_range_max}")
-    message(DEBUG ${_SketchUpAPI})
+    message(DEBUG "_SketchUpAPI: ${_SketchUpAPI}")
 
     list(GET _SketchUpAPI 0 _SketchUpAPI_VERSION)
     list(GET _SketchUpAPI 1 _SketchUpAPI_WIN_DIR)
     list(GET _SketchUpAPI 2 _SketchUpAPI_MAC_DIR)
 
+    message(DEBUG "_SketchUpAPI_VERSION: ${_SketchUpAPI_VERSION}")
+
     if(WIN32)
       set(_SketchUpAPI_BASENAME_DIR ${_SketchUpAPI_WIN_DIR})
-      elseif(APPLE)
+    elseif(APPLE)
       set(_SketchUpAPI_BASENAME_DIR ${_SketchUpAPI_MAC_DIR})
     else()
       message(FATAL_ERROR "SketchUpAPI is only available on Win/Mac")
     endif()
+    message(DEBUG "_SketchUpAPI_BASENAME_DIR: ${_SketchUpAPI_BASENAME_DIR}")
 
     # TODO: Rename to SketchUpAPI_SEARCH_PATH?
     message(DEBUG "SketchUpAPI_SEARCH_DIR: ${SketchUpAPI_SEARCH_DIR}")
@@ -85,27 +88,27 @@ else() # Otherwise, search for a location.
     message(DEBUG "_SketchUpAPI_DIR: ${_SketchUpAPI_DIR}")
 
     if(NOT IS_DIRECTORY ${_SketchUpAPI_DIR})
+      message(DEBUG "_SketchUpAPI_DIR: NOT IS_DIRECTORY")
       continue()
     endif()
 
+    message(DEBUG "SketchUpAPI_FIND_VERSION_EXACT: ${SketchUpAPI_FIND_VERSION_EXACT}")
+    message(DEBUG "SketchUpAPI_FIND_VERSION: ${SketchUpAPI_FIND_VERSION}")
     if(SketchUpAPI_FIND_VERSION_EXACT)
-      set(_SketchUpAPI_VERSION_COMPARE "VERSION_EQUAL")
-    else()
-      set(_SketchUpAPI_VERSION_COMPARE "VERSION_GREATER_EQUAL")
-    endif()
-
-    if(SketchUpAPI_FIND_VERSION_EXACT)
-      if(NOT PACKAGE_FIND_VERSION VERSION_EQUAL ${_SketchUpAPI_VERSION})
+      if(NOT ${SketchUpAPI_FIND_VERSION} VERSION_EQUAL ${_SketchUpAPI_VERSION})
+        message(DEBUG "NOT SketchUpAPI_FIND_VERSION VERSION_EQUAL")
         continue()
       endif()
     else()
-      if(NOT PACKAGE_FIND_VERSION VERSION_GREATER_EQUAL ${_SketchUpAPI_VERSION})
+      if(NOT ${SketchUpAPI_FIND_VERSION} VERSION_GREATER_EQUAL ${_SketchUpAPI_VERSION})
+        message(DEBUG "NOT SketchUpAPI_FIND_VERSION VERSION_GREATER_EQUAL")
         continue()
       endif()
     endif()
 
     set(SketchUpAPI_DIR ${_SketchUpAPI_DIR})
     set(SketchUpAPI_VERSION ${_SketchUpAPI_VERSION})
+    message(DEBUG "Found SketchUpAPI: ${SketchUpAPI_VERSION} (SketchUpAPI_VERSION) ")
     break()
 
   endforeach()
@@ -144,11 +147,15 @@ if(APPLE)
   # Allow the bundle loader to be explicitly set. This is needed if
   # is set SketchUpAPI_DIR since it is then not possible to infer package
   # version.
-  if(DEFINED SketchUpAPI_BUNDLE_LOADER OR DEFINED ENV{SketchUpAPI_BUNDLE_LOADER})
+  message(DEBUG "SketchUpAPI_BUNDLE_LOADER: ${SketchUpAPI_BUNDLE_LOADER}")
+  message(DEBUG "SketchUpAPI_BUNDLE_LOADER (ENV): $ENV{SketchUpAPI_BUNDLE_LOADER}")
+
+  if (DEFINED ENV{SketchUpAPI_BUNDLE_LOADER})
+    set(SketchUpAPI_BUNDLE_LOADER $ENV{SketchUpAPI_BUNDLE_LOADER})
+  endif()
+
+  if(SketchUpAPI_BUNDLE_LOADER)
     # If an explicit path has been set, use that.
-    if (DEFINED ENV{SketchUpAPI_BUNDLE_LOADER})
-      set(SketchUpAPI_BUNDLE_LOADER $ENV{SketchUpAPI_BUNDLE_LOADER})
-    endif()
     message(STATUS "Using explicit SketchUpAPI bundle loader: ${SketchUpAPI_BUNDLE_LOADER}")
     if(NOT EXISTS ${SketchUpAPI_BUNDLE_LOADER})
       message(FATAL_ERROR "Unable to find bundle loader: ${SketchUpAPI_BUNDLE_LOADER}")
@@ -156,13 +163,19 @@ if(APPLE)
 
   else()
     # Pick path based on requested version.
-    string(REPLACE "." ";" _SketchUpAPI_VERSION_COMPONENTS ${SketchUpAPI_VERSION})
+    string(REPLACE "." ";" _SketchUpAPI_VERSION_COMPONENTS "${SketchUpAPI_VERSION}")
+    message(DEBUG "_SketchUpAPI_VERSION: ${_SketchUpAPI_VERSION}")
+    message(DEBUG "SketchUpAPI_VERSION: ${SketchUpAPI_VERSION}")
+    message(DEBUG "_SketchUpAPI_VERSION_COMPONENTS: ${_SketchUpAPI_VERSION_COMPONENTS}")
     list(GET _SketchUpAPI_VERSION_COMPONENTS 0 _SketchUpAPI_VERSION_MAJOR)
     list(GET _SketchUpAPI_VERSION_COMPONENTS 1 _SketchUpAPI_VERSION_MINOR)
-    set(_SketchUpAPI_PATH_SketchUpAPIFFIX "SketchUp ${_SketchUpAPI_VERSION_MAJOR}")
+    set(_SketchUpAPI_PATH_SUFFIX "SketchUp ${_SketchUpAPI_VERSION_MAJOR}")
+    message(DEBUG "_SketchUpAPI_PATH_SUFFIX: ${_SketchUpAPI_PATH_SUFFIX}")
     unset(_SketchUpAPI_APP CACHE)
     find_program(SketchUpAPI_BUNDLE_LOADER "SketchUp" PATH_SUFFIXES ${_SketchUpAPI_PATH_SUFFIX})
-    # TODO: Search multiple version paths?
+    message(DEBUG "SketchUpAPI_BUNDLE_LOADER: ${SketchUpAPI_BUNDLE_LOADER}")
+    # TODO: Search paths for multiple SketchUp application versions
+    #       independent of the requested package version? Equal or newer?
     # TODO: Make this part of REQUIRED_VARS on macOS?
     if(NOT EXISTS ${SketchUpAPI_BUNDLE_LOADER})
       message(FATAL_ERROR "Unable to find bundle loader: ${SketchUpAPI_BUNDLE_LOADER}")
@@ -248,5 +261,9 @@ if(SketchUpAPI_FOUND AND NOT TARGET SketchUp::SketchUpAPI)
       LINKER:-bundle -bundle_loader ${SketchUpAPI_BUNDLE_LOADER}
     )
     # TODO: Check @executable_path etc...
+    # example.bundle:
+    # 	@executable_path/../Frameworks/Ruby.framework/Versions/Current/Ruby (compatibility version 2.5.0, current version 2.5.1)
+    # 	/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 400.9.4)
+    # 	/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1252.250.1)
   endif()
 endif()

@@ -22,9 +22,10 @@ source_group(TREE ${CMAKE_CURRENT_LIST_DIR} PREFIX "Source Files" FILES ${SOURCE
 set(EXTENSION_NAME example)
 
 # TODO(Example): Set the versions of Ruby you build against here:
-# TODO: Version 2.2 isn't useful, at least not on macOS where the Live C API
-#       symbols weren't exported. Temporarily here to test the process.
-set(EXTENSION_RUBY_VERSIONS "2.2" "2.5")
+# This should be a list of versions with major and minor denotation:
+#
+#   set(EXTENSION_RUBY_VERSIONS "2.2" "2.5")
+set(EXTENSION_RUBY_VERSIONS "2.5")
 foreach(RUBY_VERSION ${EXTENSION_RUBY_VERSIONS})
 
   message(STATUS "Configuring Ruby extension for Ruby ${RUBY_VERSION}")

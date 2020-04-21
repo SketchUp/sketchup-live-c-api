@@ -116,21 +116,19 @@ function(add_ruby_extension_library
 
   if(WIN32)
     # Ruby require the library to have .so extension on Windows.
-    set_target_properties(${EXTENSION_LIB} PROPERTIES SUFFIX ".so" )
+    set_target_properties(${EXTENSION_LIB} PROPERTIES SUFFIX ".so")
   elseif(APPLE)
     # Ruby require the library to have .bundle extension on OSX.
-    set_target_properties(${EXTENSION_LIB} PROPERTIES SUFFIX ".bundle" )
+    set_target_properties(${EXTENSION_LIB} PROPERTIES SUFFIX ".bundle")
     # Remove the "lib" prefix as the name must match the Init_* function.
-    set_target_properties(${EXTENSION_LIB} PROPERTIES PREFIX "" )
+    set_target_properties(${EXTENSION_LIB} PROPERTIES PREFIX "")
   endif()
 
   # Verify targets link against live C API.
-  # TODO: Account for platform differences in names.
   include("DependencyTools")
   validate_dependencies(${EXTENSION_LIB}
-    $<TARGET_FILE:${EXTENSION_LIB}>
     EXPECTED sketchup.exe
-    UNEXPECTED SketchUpAPI.dll
+    UNEXPECTED SketchUpAPI.dll SketchUpAPI.framework
   )
 
   # Make key variables available to parent scope:

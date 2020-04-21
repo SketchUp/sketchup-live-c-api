@@ -4,7 +4,9 @@
 # CMake 3.15.4 contains updates to the default configuration of Windows projects
 # that makes it easier to manage warning levels and run-time libraries.
 # https://gitlab.kitware.com/cmake/cmake/issues/19084
-cmake_minimum_required(VERSION 3.15.4)
+#
+# CMake 3.17 for CHECK_START/CHECK_PASS/CHECK_FAIL.
+cmake_minimum_required(VERSION 3.17.0)
 
 # Validate platform.
 if(NOT (WIN32 OR APPLE))

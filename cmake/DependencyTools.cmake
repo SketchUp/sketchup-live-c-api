@@ -1,9 +1,66 @@
-# Utility function to validate dependencies.
-function(validate_dependencies TARGET_NAME BINARY_FILE)
+#[=======================================================================[.rst:
+DependencyTools
+---------------
+
+Functions to check for expected and unexpected dependencies.
+
+It uses various tools to obtain the list of required shared library
+files:
+
+::
+
+   dumpbin (Windows)
+   otool (Mac OSX)
+
+The following functions are provided by this module:
+
+::
+
+   validate_dependencies
+
+::
+
+  VALIDATE_DEPENDENCIES(<target>
+                        EXPECTED <expected>...
+                        [UNEXPECTED <unexpected>...])
+
+Adds a post-build command to <target> that checks for <expected> and
+<unexpected> dependencies.
+
+If any of the <expected> dependencie are missing the command will exit with
+an error code.
+
+If any <unexpected> dependencies are found the command will exit with
+an error code.
+
+The function will use only the items in <expected> and <unexpected> that are
+relevant for the current platform. The supported filetypes are:
+
+   Windows
+   - .dll
+   - .exe
+
+   macOS
+   - .bundle
+   - .framework
+
+Example:
+
+::
+
+  include("DependencyTools")
+  validate_dependencies(${EXTENSION_LIB}
+    EXPECTED sketchup.exe
+    UNEXPECTED SketchUpAPI.dll SketchUpAPI.framework
+  )
+
+#]=======================================================================]
+
+function(validate_dependencies TARGET_NAME)
   # Define the supported set of keywords.
   set(noValues "")
-  set(singleValues EXPECTED UNEXPECTED)
-  set(multiValues "")
+  set(singleValues "")
+  set(multiValues EXPECTED UNEXPECTED)
 
   # Process the arguments passed in.
   cmake_parse_arguments(ARG
@@ -13,36 +70,28 @@ function(validate_dependencies TARGET_NAME BINARY_FILE)
     ${ARGN}
   )
 
+  message(DEBUG "")
+  message(DEBUG "ARG_EXPECTED: ${ARG_EXPECTED}")
+  message(DEBUG "ARG_UNEXPECTED: ${ARG_UNEXPECTED}")
+
   if(NOT DEFINED ARG_EXPECTED OR ARG_EXPECTED STREQUAL "")
     message(SEND_ERROR "Required argument EXPECTED missing.")
   endif()
 
-  set(SCRIPTS_PATH "${PROJECT_SOURCE_DIR}/cext/scripts")
-  if(MSVC)
-    find_program(DUMPBIN "dumpbin")
-    message(DEBUG dumpbin: ${DUMPBIN})
-    add_custom_command(TARGET ${TARGET_NAME}
-      POST_BUILD
-      COMMAND ${SCRIPTS_PATH}/depcheck.bat
-        ${DUMPBIN} ${BINARY_FILE} ${ARG_EXPECTED} ${ARG_UNEXPECTED}
-      COMMENT "Validate dependencies of ${BINARY_FILE}>" VERBATIM
-    )
-  else()
-    # TODO: Add macOS support.
-    # otool -L <binary>
-    #
-    #   tthomas-us-la:2.5 tthomas2$ otool -L example.bundle
-    # example.bundle:
-    # 	@executable_path/../Frameworks/Ruby.framework/Versions/Current/Ruby (compatibility version 2.5.0, current version 2.5.1)
-    # 	/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 400.9.4)
-    # 	/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1252.250.1)
-    #
-    #   tthomas-us-la:image_lib tthomas2$ otool -L imagelib_tests
-    # imagelib_tests:
-    # 	@rpath/SketchUpAPI.framework/Versions/A/SketchUpAPI (compatibility version 1.0.0, current version 1.0.0)
-    # 	/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 400.9.4)
-    #   /usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1252.250.1)
+  set(TARGET_BINARY $<TARGET_FILE:${TARGET_NAME}>)
+  message(DEBUG "TARGET_BINARY: ${TARGET_BINARY}")
 
-    message(WARNING "Unable to validate dependencies: Unsupported compiler.")
-  endif()
+  # https://stackoverflow.com/a/20989991/486990
+  string (REPLACE ";" "$<SEMICOLON>" CMD_EXPECTED "${ARG_EXPECTED}")
+  string (REPLACE ";" "$<SEMICOLON>" CMD_UNEXPECTED "${ARG_UNEXPECTED}")
+  add_custom_command(TARGET ${TARGET_NAME}
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND}
+      -DBINARY_FILE=${TARGET_BINARY}
+      -DEXPECTED=${CMD_EXPECTED}
+      -DUNEXPECTED=${CMD_UNEXPECTED}
+      -P ${PROJECT_SOURCE_DIR}/cext/scripts/depcheck.cmake
+      # --log-level=DEBUG
+    COMMENT "Validate dependencies of ${TARGET_BINARY}" VERBATIM
+  )
 endfunction()
