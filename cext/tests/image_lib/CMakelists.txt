@@ -42,7 +42,7 @@ foreach(file_i ${SketchUpAPI_BINARIES})
   )
 endforeach(file_i)
 
-# Verify test exe's link against standalone C API.
+# Verify test executable link against standalone C API.
 include("DependencyTools")
 validate_dependencies(${TEST_APP_NAME}
   EXPECTED SketchUpAPI.dll SketchUpAPI.framework
