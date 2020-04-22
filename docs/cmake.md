@@ -16,28 +16,71 @@ The project has also mainly been tested as a Visual Studio Code project.
 
 * CMake 3.17 or newer
 * Visual Studio 2019
-* XCode 11 (Clang 11)
+* XCode 10.3 (Clang 10)
 
 ## Getting started with VSCode and CMake
 
 Upon opening the project in VSCode the editor will prompt to install any necessary VSCode extensions that might be missing.
 
-Once open, choose your CMake toolkit and build configuration.
+Once open, choose your CMake toolkit.
+
+![](images/vscode-cmake-toolkit.png)
+
+The following toolkits have been used while developing this example project:
+
+* Visual Studio Professional 2019 Release - amd64
+* Clang 10.0.1
 
 ### Configuration
 
-TODO: Setting up SLAPI directory
+The SketchUp C API is not included in this repository. It must be downloaded separately from the [Developer Portal](https://developer.sketchup.com/).
 
-<Command Palette> » CMake: Configure
+Download the ZIP file for your platform to a directory; for example `"C:/Users/<username>/SLAPI"`.
+
+While unpacking, make sure the files are extracted to a directory that matches the base name of the ZIP.
+
+![](images/sdk-locations.png)
+
+Then add that path to the CMake environment variables with the key `SketchUpAPI_SEARCH_DIR`.
+
+The project will look for an appropriate SDK package in the path given by `SketchUpAPI_SEARCH_DIR` using the name of the directories to determine what version they represent.
+
+You can set up this variable from VSCode for convenience:
+
+`<Command Palette>` » Preferences: Open Settings (JSON)
+
+```json
+{
+  "cmake.environment": {
+      "SketchUpAPI_SEARCH_DIR": "C:/Users/<username>/SLAPI"
+  }
+}
+```
+
+After that is set up you should be able to invoke a successful CMake configuration:
+
+`<Command Palette>` » CMake: Configure
 
 ### Building
 
-<Command Palette> » CMake: Build
+`<Command Palette>` » CMake: Build
 
 ### Running Tests
 
-TODO: Running tests
+To run the tests you can invoke CTest and see the results in the VSCode Output panel.
+
+`<Command Palette>` » CMake: Run Tests
+
+![](images/vscode-cmake-ctest.png)
+
+Alternatively, the VSCode Test Runner extension can be used for easy granular control. It also provides easy access to debug or rerun specific tests.
+
+![](images/vscode-cmake-testrunner.png)
 
 ### Debugging
 
 TODO: Debugging
+
+### Running the Ruby Extension
+
+TODO: Running Ruby Extension
