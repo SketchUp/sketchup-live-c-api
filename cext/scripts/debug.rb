@@ -1,3 +1,13 @@
+# Helper file to aid in debugging the Ruby C Extension.
+#
+#   sketchup.exe -RubyStartup path/to/this/debug.rb -RubyStartupArg <configuration>
+#
+# <configuration> should refer to a CMake configuration; Debug, Release
+#
+# This will load the Ruby C Extension from the binary output directory instead
+# of the installed version.
+#
+#   <project_dir>/cext/build/<configuration>/<ruby_version>/example.{so,bundle}
 module Examples
   module LiveCAPI
 

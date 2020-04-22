@@ -5,10 +5,16 @@ require 'tempfile'
 module Examples
   module LiveCAPI
 
-    puts "Loading C Extension" # Debug
+    # Load guard for the Ruby C Extension, allowing the binary to be loaded
+    # from the build directory.
     if defined?(Examples::LiveCAPI::CEXT_VERSION)
+      # This means the Ruby C Extension was loaded via the
+      # <project_dir>/cext/scripts/debug.rb helper for purposes of debugging.
       puts "#{self.name} C Extension already loaded"
     else
+      # This binary is not checked in. Use CMake to "install" it to this
+      # location before running/packaging the SketchUp extension.
+      # (VSCode) `<Command Palette>` » CMake: Install
       require 'live-c-api/cext/2.5/example'
     end
 

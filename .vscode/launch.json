@@ -5,6 +5,8 @@
   "version": "0.2.0",
   "configurations": [
     {
+      // For debugging Ruby code. Launch SketchUp using the
+      // "Launch SketchUp in Ruby Debug mode" task.
       "name": "Listen for rdebug-ide",
       "type": "Ruby",
       "request": "attach",
@@ -14,12 +16,12 @@
       "remoteWorkspaceRoot": "${workspaceRoot}"
     },
     {
+      // Useful to invoke debugging of tests with custom arguments.
       // https://code.visualstudio.com/docs/cpp/launch-json-reference
       // https://vector-of-bool.github.io/docs/vscode-cmake-tools/debugging.html
       "name": "Debug CMake Target (MSVC)",
       "type": "cppvsdbg",
       "request": "launch",
-      // Resolved by CMake Tools:
       "program": "${command:cmake.launchTargetPath}",
       "args": [
         // "--gtest_filter=ColorTest.*"
@@ -28,7 +30,8 @@
       "cwd": "${workspaceFolder}",
     },
     {
-      "name": "Debug Ruby C++ Extension (msvc)",
+      // Debug the Ruby C Extension running in SketchUp. (Windows)
+      "name": "Debug Ruby C++ Extension (Windows, MSVC)",
       "type": "cppvsdbg",
       "request": "launch",
       "program": "C:/Program Files/SketchUp/SketchUp ${input:sketchupVersion}/SketchUp.exe",
@@ -44,7 +47,8 @@
       "externalConsole": false
     },
     {
-      "name": "Debug Ruby C++ Extension (clang)",
+      // Debug the Ruby C Extension running in SketchUp. (macOS)
+      "name": "Debug Ruby C++ Extension (macOS, Clang)",
       "type": "cppdbg",
       "request": "launch",
       "program": "/Applications/SketchUp ${input:sketchupVersion}/SketchUp.app/Contents/MacOS/SketchUp",
