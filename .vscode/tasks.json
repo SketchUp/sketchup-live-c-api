@@ -11,7 +11,10 @@
         "sketchup:debug",
         "${input:sketchupVersion}"
       ],
-      "runOptions": { "reevaluateOnRerun": false }
+      "runOptions": {
+        "reevaluateOnRerun": false
+      },
+      "problemMatcher": []
     }
   ],
   "inputs": [

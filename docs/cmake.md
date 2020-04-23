@@ -104,20 +104,72 @@ The debugger should break on the break point set in the VSCode editor.
 
 ## Running/Debugging the Ruby Extension
 
+### Setup
+
 *Make sure to run `bundle install` to ensure all required gems are installed.*
 
-*TODO: Running Ruby Extension*
+To ease developing Ruby Extensions for SketchUp it's convenient to load it directly from the repository source. To do so you need a helper file in the regular SketchUp Plugins directory.
 
-*TODO: Adding repository paths to SketchUp*
+This project includes such a file that also aids in debugging the Ruby C Extension binaries from the build directory.
+
+Copy the [`cext/scripts/!load_external.rb`](../cext/scripts/!load_external.rb) file to the Plugins directory of the SketchUp version you will be using.
+
+Standard locations for SketchUp 2019 are:
+* %APPDATA%\SketchUp\SketchUp 2019\SketchUp\Plugins
+* ~/Library/Application Support/SketchUp 2019/SketchUp/Plugins
+
+You get get the for your machine and SketchUp installation by typing
+`Sketchup.find_support_file('Plugins')` into the Ruby Console.
+
+After copying the file to your Plugins directory you need to update the path to point to where you have located the project:
+
+```rb
+paths = [
+  '<TODO_PathToRepository>/sketchup-live-c-api/ruby',
+]
+```
 
 ### Running the Ruby Extension
 
-`<Command Palette>` » Tasks: Run Task » Launch SketchUp in Ruby Debug mode
+If you launch SketchUp directly after setting up the `!load_external.rb` helper it will fail to load the Ruby C Extension unless you have copied it into the extension's Ruby source. Use CMake to install the binaries to `ruby/live-c-api/cext/`:
 
-`<Command Palette>` » Tasks: Rerun Task
+`<Command Palette>` » CMake: Install
 
 ### Debugging Ruby C-Extension
 
+If you need to debug the Ruby C Extension while it runs inside of SketchUp the project is set up with two debug tasks for that purpose; one for each platform.
+
+* Debug Ruby C++ Extension (Windows, MSVC)
+* Debug Ruby C++ Extension (macOS, Clang)
+
+![](images/vscode-debug-setup-ruby-c-extension.png)
+
+That will prompt you for which SketchUp version to use and what Build configuration. (CMakeTools is currently unable to provide the current build configuration to `launch.json`).
+
+Once SketchUp has launched invoke the extensions and you should see the debugger break on the breakpoints you have set in your Ruby C Extension code.
+
+![](images/vscode-debugging-ruby-c-extension.png)
+
 ### Debugging Ruby Code
 
+If you need to debug your Ruby code that is also possible. For more details about this, refer to the SketchUp Ruby Debugger project:
+
 https://github.com/SketchUp/sketchup-ruby-debugger
+
+*You need to install an additional debugger library for SketchUp in order for Ruby debugging to work.*
+
+First you must launch SketchUp in a special Ruby debugging mode:
+
+`<Command Palette>` » Tasks: Run Task » Launch SketchUp in Ruby Debug mode
+
+This will prompt you for what version to use. To avoid being prompted repeatedly you can rerun the task and it will remember you last selections.
+
+`<Command Palette>` » Tasks: Rerun Task
+
+Once SketchUp has launched you can attach the Ruby debugger by using the "Listen for rdebug-ide" launch configuration:
+
+![](images/vscode-ruby-debug-launch.png)
+
+You should then see the debugger breaking on breakpoints in your Ruby code:
+
+![](images/vscode-ruby-debugging.png)
