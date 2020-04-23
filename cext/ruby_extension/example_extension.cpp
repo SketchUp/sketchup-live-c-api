@@ -201,21 +201,21 @@ VALUE selection_invert(VALUE self) {
 VALUE selection_is_curve(VALUE self) {
   auto selection = GetSelection();
   bool is_curve = false;
-  SUSelectionIsCurve(selection, &is_curve);
+  SUSelectionIsType(selection, SUSelectionType_Curve, &is_curve);
   return GetVALUE(is_curve);
 }
 
 VALUE selection_is_surface(VALUE self) {
   auto selection = GetSelection();
   bool is_surface = false;
-  SUSelectionIsSurface(selection, &is_surface);
+  SUSelectionIsType(selection, SUSelectionType_Surface, &is_surface);
   return GetVALUE(is_surface);
 }
 
 VALUE selection_is_object(VALUE self) {
   auto selection = GetSelection();
   bool is_object = false;
-  SUSelectionIsSingleObject(selection, &is_object);
+  SUSelectionIsType(selection, SUSelectionType_SingleObject, &is_object);
   return GetVALUE(is_object);
 }
 
@@ -231,7 +231,7 @@ VALUE selection_to_a(VALUE self) {
 
   SUEntityListRef list = SU_INVALID;
   SUEntityListCreate(&list);
-  SUSelectionGetEntityList(selection, list);
+  SUSelectionGetEntityList(selection, &list);
 
   size_t len = 0;
   SUEntityListSize(list, &len);
