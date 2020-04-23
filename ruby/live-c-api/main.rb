@@ -7,7 +7,7 @@ module Examples
 
     # Load guard for the Ruby C Extension, allowing the binary to be loaded
     # from the build directory.
-    if defined?(Examples::LiveCAPI::CEXT_VERSION)
+    if defined?(CEXT_VERSION)
       # This means the Ruby C Extension was loaded via the
       # <project_dir>/cext/scripts/debug.rb helper for purposes of debugging.
       puts "#{self.name} C Extension already loaded"
