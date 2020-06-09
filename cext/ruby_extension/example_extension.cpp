@@ -23,6 +23,15 @@ namespace example {
 namespace ruby {
 namespace {
 
+SUModelRef GetActiveModel() {
+  SUModelRef model = SU_INVALID;
+  SU(SUApplicationGetActiveModel(&model));
+  if (SUIsInvalid(model)) {
+    rb_raise(rb_eTypeError, "invalid model");
+  }
+  return model;
+}
+
 SUInstancePathRef GetRubyInstancePath(SUModelRef model, VALUE ruby_pid)
 {
   Check_Type(ruby_pid, T_STRING);
