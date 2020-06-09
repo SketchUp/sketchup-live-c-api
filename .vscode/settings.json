@@ -5,6 +5,7 @@
   ],
 
   "solargraph.diagnostics": true,
+  "solargraph.useBundler": true,
 
   // "cmake.loggingLevel": "debug", // CMakeTools
   "cmake.buildDirectory": "${workspaceRoot}/cext/build/${buildType}",
