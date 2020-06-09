@@ -126,6 +126,45 @@ VALUE grey_scale(VALUE self, VALUE ruby_face_pid, VALUE ruby_amount, VALUE ruby_
 }
 
 
+VALUE active_entities_num_faces(VALUE self) {
+  auto model = GetActiveModel();
+  SUEntitiesRef entities = SU_INVALID;
+  SU(SUModelGetActiveEntities(model, &entities));
+  size_t num_faces = 0;
+  SU(SUEntitiesGetNumFaces(entities, &num_faces));
+  return SIZET2NUM(num_faces);
+}
+
+VALUE active_path_pids(VALUE self) {
+  auto model = GetActiveModel();
+
+  SUInstancePathRef path = SU_INVALID;
+  auto result = SUModelGetActivePath(model, &path);
+  if (result == SU_ERROR_NO_DATA) {
+    return Qnil;
+  } else if (result != SU_ERROR_NONE) {
+    rb_raise(rb_eRuntimeError, "unable to get active path");
+  }
+
+  size_t num_items = 0;
+  SU(SUInstancePathGetPathDepth(path, &num_items));
+  VALUE pids = rb_ary_new_capa(static_cast<long>(num_items));
+
+  for (size_t i = 0; i < num_items; ++i) {
+    SUComponentInstanceRef instance = SU_INVALID;
+    SU(SUInstancePathGetInstanceAtDepth(path, i, &instance));
+    auto entity = SUComponentInstanceToEntity(instance);
+
+    int64_t pid = 0;
+    SU(SUEntityGetPersistentID(entity, &pid));
+
+    rb_ary_push(pids, LL2NUM(pid));
+  }
+
+  return pids;
+}
+
+
 #pragma clang diagnostic pop
 #pragma warning (pop)
 
@@ -146,6 +185,11 @@ EXAMPLE_EXPORT void Init_example()
 
   rb_define_module_function(mLiveCAPI, "grey_scale",
       VALUEFUNC(grey_scale), 3);
+
+  rb_define_module_function(mLiveCAPI, "active_entities_num_faces",
+      VALUEFUNC(active_entities_num_faces), 0);
+  rb_define_module_function(mLiveCAPI, "active_path_pids",
+      VALUEFUNC(active_path_pids), 0);
 }
 
 } // extern "C"

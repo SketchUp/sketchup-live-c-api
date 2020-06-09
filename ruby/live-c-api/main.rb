@@ -63,11 +63,34 @@ module Examples
       UI.messagebox(error.message)
     end
 
+
+    # Examples::LiveCAPI.num_faces_in_active_path
+    def self.num_faces_in_active_path
+      num_faces = active_entities_num_faces
+      puts "Number of faces in active entitites: #{num_faces}"
+    end
+
+    # Examples::LiveCAPI.active_path
+    def self.active_path
+      pids = active_path_pids
+      p pids
+      Sketchup.active_model.find_entity_by_persistent_id(pids)
+    end
+
     unless file_loaded?(__FILE__)
       menu = UI.menu('Plugins')
       sub_menu = menu.add_submenu('Live C API Examples')
       sub_menu.add_item('Greyscale') {
         self.blend_to_greyscale
+      }
+
+      sub_menu.add_separator
+
+      sub_menu.add_item('Number of Faces in Active Entities') {
+        self.num_faces_in_active_path
+      }
+      sub_menu.add_item('Active Path') {
+        self.active_path
       }
       file_loaded(__FILE__)
     end
