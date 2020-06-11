@@ -73,8 +73,8 @@ module Examples
     # Examples::LiveCAPI.active_path
     def self.active_path
       pids = active_path_pids
-      p pids
-      Sketchup.active_model.find_entity_by_persistent_id(pids)
+      p pids # nil if no group/component is open.
+      p Sketchup.active_model.find_entity_by_persistent_id(pids) if pids
     end
 
     unless file_loaded?(__FILE__)
