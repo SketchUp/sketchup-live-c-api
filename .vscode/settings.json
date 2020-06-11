@@ -17,9 +17,11 @@
   "cmake.configureSettings": {
     "SketchUpAPI_DIR": "${workspaceRoot}/../../SLAPI/SDK_2020.2_develop",
     // "SketchUpAPI_BUNDLE_LOADER": "/Users/tthomas2/src/git/client/sketchup/products/Debug/SketchUp.app/Contents/MacOS/SketchUp"
-    "SketchUpAPI_BUNDLE_LOADER": "/Users/tthomas2/src/git/client/sketchup/products/Release/SketchUp.app/Contents/MacOS/SketchUp"
+    // "SketchUpAPI_BUNDLE_LOADER": "/Users/tthomas2/src/git/client/sketchup/products/Release/SketchUp.app/Contents/MacOS/SketchUp"
+    "SketchUpAPI_BUNDLE_LOADER": "/Applications/SketchUp 2020/SketchUp.app/Contents/MacOS/SketchUp"
   },
-  "catch2TestExplorer.executables":[
+
+  "testMap.cpp.executables":[
     {
       "name": "${filename}",
       "description": "${relDirpath}/",
