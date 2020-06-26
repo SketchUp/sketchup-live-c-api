@@ -15,3 +15,6 @@ out/
 
 # Bundler
 Gemfile.lock
+
+# YARD
+.yardoc/
