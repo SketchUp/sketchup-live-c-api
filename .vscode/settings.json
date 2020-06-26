@@ -21,7 +21,7 @@
     "SketchUpAPI_BUNDLE_LOADER": "/Applications/SketchUp 2020/SketchUp.app/Contents/MacOS/SketchUp"
   },
 
-  "testMap.cpp.executables":[
+  "testMate.cpp.test.advancedExecutables":[
     {
       "name": "${filename}",
       "description": "${relDirpath}/",
