@@ -33,12 +33,13 @@ gtest_discover_tests(${TEST_APP_NAME})
 
 # Copy the required SketchUpAPI dependencies required to run the tests into
 # the binary directory.
+set(TEST_BINARY_DIR $<TARGET_FILE_DIR:${TEST_APP_NAME}>)
 foreach(file_i ${SketchUpAPI_BINARIES})
   add_custom_command(TARGET ${TEST_APP_NAME}
     PRE_BUILD
     COMMAND ${CMAKE_COMMAND}
-      ARGS -E copy_if_different ${file_i} ${CMAKE_CURRENT_BINARY_DIR}
-    COMMENT "Copy ${file_i} to ${CMAKE_CURRENT_BINARY_DIR} directory" VERBATIM
+      ARGS -E copy_if_different ${file_i} ${TEST_BINARY_DIR}
+    COMMENT "Copy ${file_i} to ${TEST_BINARY_DIR} directory" VERBATIM
   )
 endforeach(file_i)
 
