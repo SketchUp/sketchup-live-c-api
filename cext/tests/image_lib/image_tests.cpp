@@ -40,7 +40,7 @@ protected:
     };
     assert(pixels.size() == image_data_.size);
 
-    auto result = SUImageRepSetData(input_image_,
+    [[maybe_unused]] auto result = SUImageRepSetData(input_image_,
         image_data_.width, image_data_.height,
         image_data_.bits_per_pixel, 0, pixels.data());
     assert(result == SU_ERROR_NONE);
