@@ -23,37 +23,6 @@
 
 namespace example {
 namespace ruby {
-namespace {
-
-SUModelRef GetActiveModel() {
-  SUModelRef model = SU_INVALID;
-  SU(SUApplicationGetActiveModel(&model));
-  if (SUIsInvalid(model)) {
-    rb_raise(rb_eTypeError, "invalid model");
-  }
-  return model;
-}
-
-SUInstancePathRef GetRubyInstancePath(SUModelRef model, VALUE ruby_pid)
-{
-  Check_Type(ruby_pid, T_STRING);
-
-  const char* pid = RSTRING_PTR(ruby_pid);
-
-  SUStringRef pid_ref = SU_INVALID;
-  SU(SUStringCreateFromUTF8(&pid_ref, pid));
-
-  SUInstancePathRef instance_path = SU_INVALID;
-  SU(SUInstancePathCreate(&instance_path));
-  SU(SUModelGetInstancePathByPid(model, pid_ref, &instance_path));
-
-  SU(SUStringRelease(&pid_ref));
-
-  return instance_path;
-}
-
-} // namespace
-
 
 // Disable the warnings for "unreferenced formal parameter" due to Ruby's
 // required `self` argument which is often unused.
