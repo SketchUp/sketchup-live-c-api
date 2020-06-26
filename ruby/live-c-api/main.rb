@@ -20,10 +20,17 @@ module Examples
 
     class Failure < StandardError; end
 
+    MSG_SELECT_TEXTURED_FACE = 'Select exactly one textured face.'
+    MSG_EXPECTED_BLEND_RATIO = 'Blend Ratio must be between 0.0 and 1.0.'
+
     def self.blend_to_greyscale
       model = Sketchup.active_model
       faces = model.selection.grep(Sketchup::Face)
-      raise Failure, 'Select exactly one face.' if faces.size != 1
+      raise Failure, MSG_SELECT_TEXTURED_FACE if faces.size != 1
+
+      face = faces.first
+      texture = face&.material&.texture
+      raise Failure, MSG_SELECT_TEXTURED_FACE if texture.nil?
 
       prompts = ['Blend Ratio:']
       defaults = [0.5]
@@ -31,23 +38,9 @@ module Examples
       return if results == false
 
       amount = results[0]
+      raise Failure, MSG_EXPECTED_BLEND_RATIO unless (0.0..1.0).include?(amount)
 
-      face = faces.first
-
-      path = model.active_path || []
-      path << face
-      face_pid_path = Sketchup::InstancePath.new(path).persistent_id_path
-
-      image_rep = Tempfile.create(['greyscale-', '.png']) do |file|
-        result = grey_scale(face_pid_path, amount, file.path)
-        raise Failure, 'Failed to generate texture.' unless result
-
-        puts file.path
-        puts File.exist?(file.path)
-        file.close
-
-        Sketchup::ImageRep.new(file.path)
-      end
+      image_rep = grey_scale(texture.image_rep, amount)
 
       model.start_operation('Greyscale Blend', true)
 
@@ -74,10 +67,12 @@ module Examples
 
     # Examples::LiveCAPI.reload
     def self.reload
+      # rubocop:disable SketchupSuggestions/FileEncoding
       original_verbose = $VERBOSE
       $VERBOSE = nil
       load __FILE__
       pattern = File.join(__dir__, '**/*.rb')
+      # rubocop:enable SketchupSuggestions/FileEncoding
       Dir.glob(pattern).each { |file| load file }.size
     ensure
       $VERBOSE = original_verbose

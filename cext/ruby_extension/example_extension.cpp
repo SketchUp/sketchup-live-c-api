@@ -1,6 +1,7 @@
 #include "example_config.h"
 #include "example_export.h"
 
+#include <assert.h>
 #include <array>
 #include <algorithm>
 #include <cassert>
@@ -10,6 +11,7 @@
 #include <vector>
 
 #include <SketchUpAPI/sketchup.h>
+#include <SketchUpAPI/application/ruby_api.h>
 
 #include "ruby/framework.h"
 #include "utilities.h"
@@ -62,7 +64,7 @@ SUInstancePathRef GetRubyInstancePath(SUModelRef model, VALUE ruby_pid)
 #pragma clang diagnostic ignored "-Wunused-parameter"
 
 
-VALUE grey_scale(VALUE self, VALUE ruby_face_pid, VALUE ruby_amount, VALUE ruby_temp_path)
+VALUE grey_scale(VALUE self, VALUE ruby_image_rep, VALUE ruby_amount)
 {
   SUModelRef model = SU_INVALID;
   SU(SUApplicationGetActiveModel(&model));
@@ -70,59 +72,35 @@ VALUE grey_scale(VALUE self, VALUE ruby_face_pid, VALUE ruby_amount, VALUE ruby_
     rb_raise(rb_eTypeError, "invalid model");
   }
 
-  // Face PID parameter
-  SUInstancePathRef face_path = GetRubyInstancePath(model, ruby_face_pid);
-
-  SUEntityRef entity = SU_INVALID;
-  SUInstancePathGetLeafAsEntity(face_path, &entity);
-
-  SU(SUInstancePathRelease(&face_path));
-
-  if (SUEntityGetType(entity) != SURefType_Face) {
-    rb_raise(rb_eTypeError, "invalid face references");
-  }
-
-  //Amount parameter
-  double amount = NUM2DBL(ruby_amount);
-
-  // Output path parameter
-  std::string output_path(RSTRING_PTR(ruby_temp_path));
-
-  // Validate face parameter
-  SUFaceRef face = SUFaceFromEntity(entity);
-
-  SUMaterialRef material = SU_INVALID;
-  SUFaceGetFrontMaterial(face, &material);
-
-  SUMaterialType type = SUMaterialType_Colored;
-  SU(SUMaterialGetType(material, &type));
-  if (type == SUMaterialType_Colored) {
-    rb_raise(rb_eArgError, "face has no texture");
-    return Qnil;
-  }
-
-  // Blend texture towards greyscale.
-  SUTextureRef texture = SU_INVALID;
-  SU(SUMaterialGetTexture(material, &texture));
-
+  // ImageRep parameter
   SUImageRepRef image_rep = SU_INVALID;
-  SU(SUImageRepCreate(&image_rep));
-  SU(SUTextureGetColorizedImageRep(texture, &image_rep));
+  if (SU_ERROR_NONE != SUImageRepFromRuby(ruby_image_rep, &image_rep)) {
+    rb_raise(rb_eTypeError, "invalid imagerep");
+  }
+  if (SUIsInvalid(image_rep)) {
+    rb_raise(rb_eTypeError, "invalid imagerep");
+  }
 
-  auto success = GreyScaleCopy(image_rep, image_rep, amount);
-  if (!success) { return Qfalse; }
+  // Amount parameter
+  double amount = NUM2DBL(ruby_amount);
+  if (amount < 0.0 || amount > 1.0) {
+    rb_raise(rb_eTypeError, "amount must be between 0.0 and 1.0");
+  }
 
-  SUStringRef filename_ref = SU_INVALID;
-  SU(SUStringCreate(&filename_ref));
-  SU(SUTextureGetFileName(texture, &filename_ref));
-  std::string texture_filename = GetString(filename_ref);
-  SU(SUStringRelease(&filename_ref));
+  // Blend image towards greyscale.
+  SUImageRepRef image_rep_out = SU_INVALID;
+  SUImageRepCreate(&image_rep_out);
+  auto success = GreyScaleCopy(image_rep, amount, image_rep_out);
+  assert(success); // If this fails it would be a bug.
+  if (!success) {
+    SUImageRepRelease(&image_rep_out);
+    rb_raise(rb_eRuntimeError, "unable to process image");
+  }
 
-  SU(SUImageRepSaveToFile(image_rep, output_path.c_str()));
-
-  SU(SUImageRepRelease(&image_rep));
-
-  return Qtrue;
+  // Return imagerep to Ruby
+  VALUE ruby_result = Qnil;
+  SUImageRepToRuby(image_rep_out, &ruby_result);
+  return ruby_result;
 }
 
 
@@ -144,8 +122,7 @@ EXAMPLE_EXPORT void Init_example()
 
   rb_define_const(mLiveCAPI, "CEXT_VERSION", GetVALUE(EXAMPLE_VERSION));
 
-  rb_define_module_function(mLiveCAPI, "grey_scale",
-      VALUEFUNC(grey_scale), 3);
+  rb_define_module_function(mLiveCAPI, "grey_scale", VALUEFUNC(grey_scale), 2);
 }
 
 } // extern "C"
