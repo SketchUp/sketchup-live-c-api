@@ -23,6 +23,33 @@
 
 namespace example {
 namespace ruby {
+namespace {
+
+void GetEdgesWithMaterial(SUEntityListRef list, VALUE edges) {
+  SUEntityListIteratorRef it = SU_INVALID;
+  SU(SUEntityListIteratorCreate(&it));
+
+  SUEntityRef entity = SU_INVALID;
+  SU(SUEntityListBegin(list, &it));
+  while(SUEntityListIteratorGetEntity(it, &entity) == SU_ERROR_NONE) {
+    if (SUEntityGetType(entity) == SURefType_Edge) {
+      auto element = SUDrawingElementFromEntity(entity);
+      SUMaterialRef material = SU_INVALID;
+      auto result = SUDrawingElementGetMaterial(element, &material);
+      assert(result == SU_ERROR_NONE || result == SU_ERROR_NO_DATA);
+      if (result == SU_ERROR_NONE) {
+        VALUE ruby_edge = Qnil;
+        SU(SUEntityToRuby(entity, &ruby_edge));
+        rb_ary_push(edges, ruby_edge);
+      }
+    }
+    SUEntityListIteratorNext(it);
+  }
+
+  SU(SUEntityListIteratorRelease(&it));
+}
+
+} // namespace
 
 // Disable the warnings for "unreferenced formal parameter" due to Ruby's
 // required `self` argument which is often unused.
@@ -72,6 +99,36 @@ VALUE grey_scale(VALUE self, VALUE ruby_image_rep, VALUE ruby_amount)
   return ruby_result;
 }
 
+VALUE find_edges_with_material(VALUE self)
+{
+  SUModelRef model = SU_INVALID;
+  SU(SUApplicationGetActiveModel(&model));
+  if (SUIsInvalid(model)) {
+    rb_raise(rb_eTypeError, "invalid model");
+  }
+
+  VALUE edges = rb_ary_new();
+  SUEntityListRef entity_list = SU_INVALID;
+  SU(SUEntityListCreate(&entity_list));
+
+  SUSelectionRef selection = SU_INVALID;
+  SU(SUModelGetSelection(model, &selection));
+
+  size_t num_selected = 0;
+  SU(SUSelectionGetNumElements(selection, &num_selected));
+  if (num_selected > 0) {
+    SU(SUSelectionGetEntityList(selection, &entity_list));
+  } else {
+    SUEntitiesRef entities = SU_INVALID;
+    SU(SUModelGetActiveEntities(model, &entities));
+    SU(SUEntitiesEntityListFill(entities, SURefType_Edge, entity_list));
+  }
+  GetEdgesWithMaterial(entity_list, edges);
+
+  SU(SUEntityListRelease(&entity_list));
+
+  return edges;
+}
 
 #pragma clang diagnostic pop
 #pragma warning (pop)
@@ -92,6 +149,9 @@ EXAMPLE_EXPORT void Init_example()
   rb_define_const(mLiveCAPI, "CEXT_VERSION", GetVALUE(EXAMPLE_VERSION));
 
   rb_define_module_function(mLiveCAPI, "grey_scale", VALUEFUNC(grey_scale), 2);
+
+  rb_define_module_function(mLiveCAPI, "find_edges_with_material",
+      VALUEFUNC(find_edges_with_material), 0);
 }
 
 } // extern "C"

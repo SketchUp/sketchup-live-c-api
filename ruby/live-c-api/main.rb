@@ -64,11 +64,26 @@ module Examples
       UI.messagebox(error.message)
     end
 
+    def self.remove_edge_materials
+      edges = find_edges_with_material
+      return if edges.empty?
+
+      model = Sketchup.active_model
+      model.start_operation('Remove Edge Materials', true)
+      edges.each { |edge| edge.material = nil }
+      model.commit_operation
+
+      puts "Removed material from #{edges.size} edges."
+    end
+
     unless file_loaded?(__FILE__)
       menu = UI.menu('Plugins')
       sub_menu = menu.add_submenu('Live C API Examples')
-      sub_menu.add_item('Greyscale') {
+      sub_menu.add_item('Blend Texture to Greyscale') {
         self.blend_to_greyscale
+      }
+      sub_menu.add_item('Remove Edge Materials') {
+        self.remove_edge_materials
       }
       file_loaded(__FILE__)
     end
