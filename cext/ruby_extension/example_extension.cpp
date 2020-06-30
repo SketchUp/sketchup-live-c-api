@@ -171,22 +171,20 @@ VALUE get_vertices(VALUE self, VALUE ruby_entities)
     }
 
     auto type = SUEntityGetType(entity);
-    switch(type) {
-    case SURefType_Edge:
-      {
-        SUEdgeRef edge = SUEdgeFromEntity(entity);
-        assert(SUIsValid(edge));
-
-        SUVertexRef vertex = SU_INVALID;
-        SU(SUEdgeGetStartVertex(edge, &vertex));
-        vertices.insert(vertex);
-
-        vertex = SU_INVALID;
-        SU(SUEdgeGetEndVertex(edge, &vertex));
-        vertices.insert(vertex);
-      }
-      break;
+    if (type != SURefType_Edge) {
+      continue;
     }
+
+    SUEdgeRef edge = SUEdgeFromEntity(entity);
+    assert(SUIsValid(edge));
+
+    SUVertexRef vertex = SU_INVALID;
+    SU(SUEdgeGetStartVertex(edge, &vertex));
+    vertices.insert(vertex);
+
+    vertex = SU_INVALID;
+    SU(SUEdgeGetEndVertex(edge, &vertex));
+    vertices.insert(vertex);
   }
 
   VALUE ruby_vertices = rb_ary_new_capa(static_cast<long>(vertices.size()));

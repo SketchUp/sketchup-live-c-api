@@ -61,8 +61,8 @@ struct Pixel24bit {
   Pixel24bit(SUByte red, SUByte green, SUByte blue) :
       r(red), g(green), b(blue) {}
   SUByte r;
-  SUByte b;
   SUByte g;
+  SUByte b;
   #endif
 };
 
@@ -76,9 +76,9 @@ protected:
     #ifdef _WIN32
     SUColorOrder expected{ 2, 1, 0, 3 };
     #else
-    SUColorOrder expected{ 0, 1, 2, 3 };
+    [[maybe_unused]] SUColorOrder expected{ 0, 1, 2, 3 };
     #endif
-    SUColorOrder actual = SUGetColorOrder();
+    [[maybe_unused]] SUColorOrder actual = SUGetColorOrder();
     assert(actual == expected);
   }
 
