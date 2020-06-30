@@ -39,7 +39,7 @@
         "-RubyStartup",
         "${workspaceFolder}\\cext\\scripts\\debug.rb",
         "-RubyStartupArg",
-        "Config=${input:buildType};Path=${workspaceRoot}/ruby"
+        "Id=LiveCAPI;Config=${input:buildType};Path=${workspaceRoot}/ruby"
       ],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",
@@ -56,7 +56,7 @@
         "-RubyStartup",
         "${workspaceFolder}/cext/scripts/debug.rb",
         "-RubyStartupArg",
-        "Config=${input:buildType};Path=${workspaceRoot}/ruby"
+        "Id=LiveCAPI;Config=${input:buildType};Path=${workspaceRoot}/ruby"
       ],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",

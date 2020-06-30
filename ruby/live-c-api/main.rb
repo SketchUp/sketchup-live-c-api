@@ -7,9 +7,17 @@ module Examples
 
     # Load guard for the Ruby C Extension, allowing the binary to be loaded
     # from the build directory.
-    if defined?(CEXT_VERSION)
-      # This means the Ruby C Extension was loaded via the
+    #
+    # Parse startup args:
+    # "Config=${input:buildType};Path=${workspaceRoot}/ruby"
+    args = (ARGV[0] || '').split(';')
+    args = args.map { |arg| arg.split('=') }.to_h
+    if args['Id'] == 'LiveCAPI'
+      # This means the Ruby C Extension will be loaded via the
       # <project_dir>/cext/scripts/debug.rb helper for purposes of debugging.
+      puts "#{self.name} C Extension deferred loading for debugging..."
+    elsif defined?(CEXT_VERSION)
+      # This means the Ruby C Extension has already been loaded by other means.
       puts "#{self.name} C Extension already loaded"
     else
       # This binary is not checked in. Use CMake to "install" it to this
