@@ -28,6 +28,9 @@ bool operator==(const SUColorOrder& lhs, const SUColorOrder& rhs) {
          lhs.green_index == rhs.green_index &&
          lhs.alpha_index == rhs.alpha_index;
 }
+bool operator!=(const SUColorOrder& lhs, const SUColorOrder& rhs) {
+  return !(lhs == rhs);
+}
 
 
 namespace example {
@@ -76,10 +79,13 @@ protected:
     #ifdef _WIN32
     SUColorOrder expected{ 2, 1, 0, 3 };
     #else
-    [[maybe_unused]] SUColorOrder expected{ 0, 1, 2, 3 };
+    SUColorOrder expected{ 0, 1, 2, 3 };
     #endif
-    [[maybe_unused]] SUColorOrder actual = SUGetColorOrder();
-    assert(actual == expected);
+    SUColorOrder actual = SUGetColorOrder();
+    if (actual != expected) {
+      std::cerr << "FATAL ERROR: incorrect RGBA order\n";
+      abort();
+    }
   }
 
   ImageTest() : image_data_(2, 2, 3),
