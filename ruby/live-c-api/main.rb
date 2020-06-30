@@ -76,6 +76,22 @@ module Examples
       puts "Removed material from #{edges.size} edges."
     end
 
+    def self.label_vertex_positions
+      model = Sketchup.active_model
+      vertices = get_vertices(model.selection.to_a)
+      return if vertices.empty?
+
+      entities = model.active_entities
+      direction = Geom::Vector3d.new(5, 5, 5)
+      model.start_operation('Label Vertex Positions', true)
+      vertices.each { |vertex|
+        entities.add_text(vertex.position.to_s, vertex.position, direction)
+      }
+      model.commit_operation
+
+      puts "Labelled #{vertices.size} vertices."
+    end
+
     unless file_loaded?(__FILE__)
       menu = UI.menu('Plugins')
       sub_menu = menu.add_submenu('Live C API Examples')
@@ -84,6 +100,9 @@ module Examples
       }
       sub_menu.add_item('Remove Edge Materials') {
         self.remove_edge_materials
+      }
+      sub_menu.add_item('Label Vertex Positions') {
+        self.label_vertex_positions
       }
       file_loaded(__FILE__)
     end

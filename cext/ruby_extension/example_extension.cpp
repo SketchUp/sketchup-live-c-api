@@ -9,6 +9,7 @@
 #include <string>
 #include <string_view>
 #include <vector>
+#include <unordered_set>
 
 #include <SketchUpAPI/sketchup.h>
 #include <SketchUpAPI/application/ruby_api.h>
@@ -19,6 +20,24 @@
 #include "slapi/color.h"
 #include "slapi/utilities.h"
 #include "image.h"
+
+
+// Allow SUVertexRef to be hashable used with std::unordered_set:
+
+bool operator==(const SUVertexRef& lhs, const SUVertexRef& rhs) {
+  return lhs.ptr == rhs.ptr;
+}
+
+namespace std
+{
+  template<> struct hash<SUVertexRef>
+  {
+    std::size_t operator()(SUVertexRef const& vertex) const noexcept
+    {
+      return std::hash<void*>{}(vertex.ptr);
+    }
+  };
+}
 
 
 namespace example {
@@ -130,6 +149,57 @@ VALUE find_edges_with_material(VALUE self)
   return edges;
 }
 
+VALUE get_vertices(VALUE self, VALUE ruby_entities)
+{
+  SUModelRef model = SU_INVALID;
+  SU(SUApplicationGetActiveModel(&model));
+  if (SUIsInvalid(model)) {
+    rb_raise(rb_eTypeError, "invalid model");
+  }
+
+  Check_Type(ruby_entities, T_ARRAY);
+
+  // Using a set to ensure we have only unique vertices.
+  std::unordered_set<SUVertexRef> vertices;
+  long num_entities = RARRAY_LEN(ruby_entities);
+  for(long i = 0; i < num_entities; ++i) {
+    VALUE item = rb_ary_entry(ruby_entities, i);
+
+    SUEntityRef entity = SU_INVALID;
+    if (SUEntityFromRuby(item, &entity) != SU_ERROR_NONE) {
+      continue;
+    }
+
+    auto type = SUEntityGetType(entity);
+    switch(type) {
+    case SURefType_Edge:
+      {
+        SUEdgeRef edge = SUEdgeFromEntity(entity);
+        assert(SUIsValid(edge));
+
+        SUVertexRef vertex = SU_INVALID;
+        SU(SUEdgeGetStartVertex(edge, &vertex));
+        vertices.insert(vertex);
+
+        vertex = SU_INVALID;
+        SU(SUEdgeGetEndVertex(edge, &vertex));
+        vertices.insert(vertex);
+      }
+      break;
+    }
+  }
+
+  VALUE ruby_vertices = rb_ary_new_capa(static_cast<long>(vertices.size()));
+  for(const auto& vertex : vertices) {
+    SUEntityRef entity = SUVertexToEntity(vertex);
+    VALUE ruby_vertex = Qnil;
+    SU(SUEntityToRuby(entity, &ruby_vertex));
+    rb_ary_push(ruby_vertices, ruby_vertex);
+  }
+  return ruby_vertices;
+}
+
+
 #pragma clang diagnostic pop
 #pragma warning (pop)
 
@@ -152,6 +222,9 @@ EXAMPLE_EXPORT void Init_example()
 
   rb_define_module_function(mLiveCAPI, "find_edges_with_material",
       VALUEFUNC(find_edges_with_material), 0);
+
+  rb_define_module_function(mLiveCAPI, "get_vertices",
+      VALUEFUNC(get_vertices), 1);
 }
 
 } // extern "C"
