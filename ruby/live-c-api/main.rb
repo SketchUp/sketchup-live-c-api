@@ -7,9 +7,17 @@ module Examples
 
     # Load guard for the Ruby C Extension, allowing the binary to be loaded
     # from the build directory.
-    if defined?(CEXT_VERSION)
-      # This means the Ruby C Extension was loaded via the
+    #
+    # Parse startup args:
+    # "Config=${input:buildType};Path=${workspaceRoot}/ruby"
+    args = (ARGV[0] || '').split(';')
+    args = args.map { |arg| arg.split('=') }.to_h
+    if args['Id'] == 'LiveCAPI'
+      # This means the Ruby C Extension will be loaded via the
       # <project_dir>/cext/scripts/debug.rb helper for purposes of debugging.
+      puts "#{self.name} C Extension deferred loading for debugging..."
+    elsif defined?(CEXT_VERSION)
+      # This means the Ruby C Extension has already been loaded by other means.
       puts "#{self.name} C Extension already loaded"
     else
       # This binary is not checked in. Use CMake to "install" it to this
@@ -20,10 +28,17 @@ module Examples
 
     class Failure < StandardError; end
 
+    MSG_SELECT_TEXTURED_FACE = 'Select exactly one textured face.'
+    MSG_EXPECTED_BLEND_RATIO = 'Blend Ratio must be between 0.0 and 1.0.'
+
     def self.blend_to_greyscale
       model = Sketchup.active_model
       faces = model.selection.grep(Sketchup::Face)
-      raise Failure, 'Select exactly one face.' if faces.size != 1
+      raise Failure, MSG_SELECT_TEXTURED_FACE if faces.size != 1
+
+      face = faces.first
+      texture = face&.material&.texture
+      raise Failure, MSG_SELECT_TEXTURED_FACE if texture.nil?
 
       prompts = ['Blend Ratio:']
       defaults = [0.5]
@@ -31,23 +46,9 @@ module Examples
       return if results == false
 
       amount = results[0]
+      raise Failure, MSG_EXPECTED_BLEND_RATIO unless (0.0..1.0).include?(amount)
 
-      face = faces.first
-
-      path = model.active_path || []
-      path << face
-      face_pid_path = Sketchup::InstancePath.new(path).persistent_id_path
-
-      image_rep = Tempfile.create(['greyscale-', '.png']) do |file|
-        result = grey_scale(face_pid_path, amount, file.path)
-        raise Failure, 'Failed to generate texture.' unless result
-
-        puts file.path
-        puts File.exist?(file.path)
-        file.close
-
-        Sketchup::ImageRep.new(file.path)
-      end
+      image_rep = grey_scale(texture.image_rep, amount)
 
       model.start_operation('Greyscale Blend', true)
 
@@ -63,21 +64,57 @@ module Examples
       UI.messagebox(error.message)
     end
 
+    def self.remove_edge_materials
+      edges = find_edges_with_material
+      return if edges.empty?
+
+      model = Sketchup.active_model
+      model.start_operation('Remove Edge Materials', true)
+      edges.each { |edge| edge.material = nil }
+      model.commit_operation
+
+      puts "Removed material from #{edges.size} edges."
+    end
+
+    def self.label_vertex_positions
+      model = Sketchup.active_model
+      vertices = get_vertices(model.selection.to_a)
+      return if vertices.empty?
+
+      entities = model.active_entities
+      direction = Geom::Vector3d.new(5, 5, 5)
+      model.start_operation('Label Vertex Positions', true)
+      vertices.each { |vertex|
+        entities.add_text(vertex.position.to_s, vertex.position, direction)
+      }
+      model.commit_operation
+
+      puts "Labelled #{vertices.size} vertices."
+    end
+
     unless file_loaded?(__FILE__)
       menu = UI.menu('Plugins')
       sub_menu = menu.add_submenu('Live C API Examples')
-      sub_menu.add_item('Greyscale') {
+      sub_menu.add_item('Blend Texture to Greyscale') {
         self.blend_to_greyscale
+      }
+      sub_menu.add_item('Remove Edge Materials') {
+        self.remove_edge_materials
+      }
+      sub_menu.add_item('Label Vertex Positions') {
+        self.label_vertex_positions
       }
       file_loaded(__FILE__)
     end
 
     # Examples::LiveCAPI.reload
     def self.reload
+      # rubocop:disable SketchupSuggestions/FileEncoding
       original_verbose = $VERBOSE
       $VERBOSE = nil
       load __FILE__
       pattern = File.join(__dir__, '**/*.rb')
+      # rubocop:enable SketchupSuggestions/FileEncoding
       Dir.glob(pattern).each { |file| load file }.size
     ensure
       $VERBOSE = original_verbose

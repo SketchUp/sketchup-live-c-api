@@ -1,4 +1,5 @@
 require_paths:
+- "C:/Program Files/SketchUp/SketchUp 2020/Tools"
 - "C:/Program Files/SketchUp/SketchUp 2019/Tools"
 - ruby
 

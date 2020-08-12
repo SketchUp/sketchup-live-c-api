@@ -5,10 +5,11 @@ AllCops:
   DisplayStyleGuide: true
   ExtraDetails: true
   SketchUp:
-    SourcePath: src
+    SourcePath: ruby
     TargetSketchUpVersion: 2018
   Exclude:
     - cext/**/*
+    - third-party/**/*
 
 SketchupDeprecations:
   Enabled: true

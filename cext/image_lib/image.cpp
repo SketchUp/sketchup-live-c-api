@@ -8,7 +8,7 @@
 
 namespace example {
 
-bool GreyScaleCopy(const SUImageRepRef input, SUImageRepRef output, double amount)
+bool GreyScaleCopy(const SUImageRepRef input, double amount, SUImageRepRef output)
 {
   if (SUIsInvalid(input) || SUIsInvalid(output)) {
     return false;
