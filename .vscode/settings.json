@@ -102,6 +102,8 @@
     "locale": "cpp",
     "ratio": "cpp",
     "xlocbuf": "cpp",
-    "xlocmes": "cpp"
+    "xlocmes": "cpp",
+    "atomic": "cpp",
+    "compare": "cpp"
   }
 }

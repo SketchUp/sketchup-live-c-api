@@ -1,5 +1,32 @@
 find_package(SketchUpRuby 2021.0 REQUIRED)
 
+# Test Ruby C extension:
+
+set(SOURCES
+  test_extension.cpp
+)
+
+add_library(compacter SHARED ${SOURCES})
+target_link_libraries(compacter
+  PRIVATE
+    SketchUp::SketchUpRuby_270
+)
+# target_compile_options(compacter PRIVATE /Wd4117)
+if(WIN32)
+  # Ruby require the library to have .so extension on Windows.
+  set_target_properties(compacter PROPERTIES SUFFIX ".so")
+elseif(APPLE)
+  # Ruby require the library to have .bundle extension on OSX.
+  set_target_properties(compacter PROPERTIES SUFFIX ".bundle")
+  # Remove the "lib" prefix as the name must match the Init_* function.
+  set_target_properties(compacter PROPERTIES PREFIX "")
+endif()
+
+if(MSVC)
+  target_compile_options(compacter PRIVATE /EHs)
+endif()
+
+
 # Test application with embedded Ruby interpreter:
 
 set(TESTS_SOURCES
@@ -11,7 +38,8 @@ target_link_libraries(compacting_tests
   PRIVATE
     SketchUp::SketchUpRuby_270
 )
-target_compile_options(compacting_tests PRIVATE /Wd4117)
+# target_compile_options(compacting_tests PRIVATE /Wd4117)
+add_dependencies(compacting_tests compacter)
 
 message(DEBUG "CMAKE_SOURCE_DIR: ${CMAKE_SOURCE_DIR}")
 message(DEBUG "CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}")
