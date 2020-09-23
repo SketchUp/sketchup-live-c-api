@@ -15,7 +15,7 @@
     // "--log-level=DEBUG" // Enable to get more info from CMake.
   ],
   "cmake.configureSettings": {
-    "SketchUpAPI_DIR": "${workspaceRoot}/../../SLAPI/SDK_2020.2_develop",
+    "SketchUpAPI_DIR": "${workspaceRoot}/../../SLAPI/SDK_WIN_x64_2020-2-172",
     // "SketchUpAPI_BUNDLE_LOADER": "/Users/tthomas2/src/git/client/sketchup/products/Debug/SketchUp.app/Contents/MacOS/SketchUp"
     // "SketchUpAPI_BUNDLE_LOADER": "/Users/tthomas2/src/git/client/sketchup/products/Release/SketchUp.app/Contents/MacOS/SketchUp"
     "SketchUpAPI_BUNDLE_LOADER": "/Applications/SketchUp 2020/SketchUp.app/Contents/MacOS/SketchUp"

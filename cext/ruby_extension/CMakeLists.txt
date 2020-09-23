@@ -1,6 +1,6 @@
 include(RubyExtension)
 
-find_package(SketchUpRuby 2019.0 REQUIRED)
+find_package(SketchUpRuby 2021.0 REQUIRED)
 
 # CMake recommends not using GLOB to collect a list of source files from
 # the source tree.
@@ -25,7 +25,7 @@ set(EXTENSION_NAME example)
 # This should be a list of versions with major and minor denotation:
 #
 #   set(EXTENSION_RUBY_VERSIONS "2.2" "2.5")
-set(EXTENSION_RUBY_VERSIONS "2.5")
+set(EXTENSION_RUBY_VERSIONS "2.5" "2.7")
 foreach(RUBY_VERSION ${EXTENSION_RUBY_VERSIONS})
 
   message(STATUS "Configuring Ruby extension for Ruby ${RUBY_VERSION}")

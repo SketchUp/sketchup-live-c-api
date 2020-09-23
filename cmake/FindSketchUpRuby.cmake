@@ -6,7 +6,7 @@
 # https://cmake.org/cmake/help/latest/manual/cmake-developer.7.html#manual:cmake-developer(7)
 # https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#imported-targets
 
-set(SketchUpRuby_VERSION "2019.0")
+set(SketchUpRuby_VERSION "2021.0")
 
 find_path(_SketchUpRuby_ROOT_DIR "SketchUp Ruby C Extension Examples.sln")
 set(_SketchUpRuby_THIRD_PARTY_DIR ${_SketchUpRuby_ROOT_DIR}/ThirdParty)
@@ -38,6 +38,15 @@ if(WIN32)
     NO_DEFAULT_PATH # Needed to ensure system Ruby isn't picked up
   )
   set(_SketchUpRuby_250_LIB_NAME x64-msvcrt-ruby250.lib)
+
+  # Ruby 2.7
+  find_path(_SketchUpRuby_270_INCLUDE_DIR "ruby.h"
+    HINTS
+      ${_SketchUpRuby_THIRD_PARTY_DIR}/include/ruby/2.7/win32_x64
+    NO_DEFAULT_PATH # Needed to ensure system Ruby isn't picked up
+  )
+  set(_SketchUpRuby_270_LIB_NAME x64-msvcrt-ruby270.lib)
+
 elseif(APPLE)
   # Ruby 2.2
   find_path(_SketchUpRuby_220_INCLUDE_ROOT_DIR "ruby.h"
@@ -72,6 +81,24 @@ elseif(APPLE)
     ${_SketchUpRuby_250_INCLUDE_SUPPORT_DIR}
   )
   set(_SketchUpRuby_250_LIB_NAME Ruby)
+
+  # Ruby 2.7
+  find_path(_SketchUpRuby_270_INCLUDE_ROOT_DIR "ruby.h"
+    HINTS
+      ${_SketchUpRuby_THIRD_PARTY_DIR}/include/ruby/2.7/mac
+    NO_DEFAULT_PATH # Needed to ensure system Ruby isn't picked up
+  )
+  find_path(_SketchUpRuby_270_INCLUDE_SUPPORT_DIR "ruby/config.h"
+    HINTS
+      ${_SketchUpRuby_THIRD_PARTY_DIR}/include/ruby/2.7/mac/x86_64-darwin18
+    NO_DEFAULT_PATH # Needed to ensure system Ruby isn't picked up
+  )
+  set(_SketchUpRuby_270_INCLUDE_DIR
+    ${_SketchUpRuby_270_INCLUDE_ROOT_DIR}
+    ${_SketchUpRuby_270_INCLUDE_SUPPORT_DIR}
+  )
+  set(_SketchUpRuby_270_LIB_NAME Ruby)
+
 endif()
 
 # Libraries:
@@ -116,12 +143,29 @@ else()
   set(_SketchUpRuby_250_IMPORTED_LIBRARY ${SketchUpRuby_250_LIBRARY})
 endif()
 
+# Ruby 2.7
+find_library(SketchUpRuby_270_LIBRARY ${_SketchUpRuby_270_LIB_NAME}
+  HINTS
+    ${_SketchUpRuby_THIRD_PARTY_DIR}/lib/mac/2.7
+    ${_SketchUpRuby_THIRD_PARTY_DIR}/lib/win32
+  NO_DEFAULT_PATH # Needed to ensure system Ruby isn't picked up
+)
+set(SketchUpRuby_270_INCLUDE_DIR ${_SketchUpRuby_270_INCLUDE_DIR})
+if(APPLE)
+  set(_SketchUpRuby_270_IMPORTED_LIBRARY ${SketchUpRuby_270_LIBRARY}/Ruby)
+else()
+  set(_SketchUpRuby_270_IMPORTED_LIBRARY ${SketchUpRuby_270_LIBRARY})
+endif()
+
 
 message(DEBUG "SketchUpRuby_220_LIBRARY: ${SketchUpRuby_220_LIBRARY}")
 message(DEBUG "SketchUpRuby_220_INCLUDE_DIR: ${SketchUpRuby_220_INCLUDE_DIR}")
 
 message(DEBUG "SketchUpRuby_250_LIBRARY: ${SketchUpRuby_250_LIBRARY}")
 message(DEBUG "SketchUpRuby_250_INCLUDE_DIR: ${SketchUpRuby_250_INCLUDE_DIR}")
+
+message(DEBUG "SketchUpRuby_270_LIBRARY: ${SketchUpRuby_270_LIBRARY}")
+message(DEBUG "SketchUpRuby_270_INCLUDE_DIR: ${SketchUpRuby_270_INCLUDE_DIR}")
 
 
 mark_as_advanced(
@@ -131,6 +175,9 @@ mark_as_advanced(
   # Ruby 2.5
   SketchUpRuby_250_LIBRARY
   SketchUpRuby_250_INCLUDE_DIR
+  # Ruby 2.7
+  SketchUpRuby_270_LIBRARY
+  SketchUpRuby_270_INCLUDE_DIR
 )
 
 
@@ -139,6 +186,7 @@ find_package_handle_standard_args(SketchUpRuby
   REQUIRED_VARS
     SketchUpRuby_220_LIBRARY SketchUpRuby_220_INCLUDE_DIR
     SketchUpRuby_250_LIBRARY SketchUpRuby_250_INCLUDE_DIR
+    SketchUpRuby_270_LIBRARY SketchUpRuby_270_INCLUDE_DIR
   VERSION_VAR
     SketchUpRuby_VERSION)
 
@@ -155,5 +203,11 @@ if(SketchUpRuby_FOUND AND NOT TARGET SketchUp::SketchUpRuby)
   set_target_properties(SketchUp::SketchUpRuby_250 PROPERTIES
     IMPORTED_LOCATION "${_SketchUpRuby_250_IMPORTED_LIBRARY}"
     INTERFACE_INCLUDE_DIRECTORIES "${SketchUpRuby_250_INCLUDE_DIR}"
+  )
+  # Ruby 2.7
+  add_library(SketchUp::SketchUpRuby_270 UNKNOWN IMPORTED)
+  set_target_properties(SketchUp::SketchUpRuby_270 PROPERTIES
+    IMPORTED_LOCATION "${_SketchUpRuby_270_IMPORTED_LIBRARY}"
+    INTERFACE_INCLUDE_DIRECTORIES "${SketchUpRuby_270_INCLUDE_DIR}"
   )
 endif()
