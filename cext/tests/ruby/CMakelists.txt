@@ -1,0 +1,23 @@
+find_package(SketchUpRuby 2021.0 REQUIRED)
+
+# Test application with embedded Ruby interpreter:
+
+set(TESTS_SOURCES
+  compacting_tests.cpp
+)
+
+add_executable(compacting_tests ${TESTS_SOURCES})
+target_link_libraries(compacting_tests
+  PRIVATE
+    SketchUp::SketchUpRuby_270
+)
+target_compile_options(compacting_tests PRIVATE /Wd4117)
+
+message(DEBUG "CMAKE_SOURCE_DIR: ${CMAKE_SOURCE_DIR}")
+message(DEBUG "CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}")
+
+add_custom_command(TARGET compacting_tests POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${CMAKE_SOURCE_DIR}/third-party/ruby/Ruby 2.7/"
+            $<TARGET_FILE_DIR:compacting_tests>
+)
