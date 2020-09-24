@@ -30,6 +30,8 @@ int main(int argc, char* argv[])
 
     ruby_show_version();
 
+    VALUE result = Qnil;
+
     std::cout << "ruby_init_loadpath...\n";
     ruby_init_loadpath();
     std::cout << "ruby_init_loadpath (done)\n";
@@ -39,13 +41,12 @@ int main(int argc, char* argv[])
     ruby_incpush("C:/Users/Thomas/SourceTree/sketchup-live-c-api/cext/tests/ruby");
     std::cout << "ruby_incpush (done)\n";
 
-    // std::cout << "rb_require compacter ...\n";
-    // VALUE result = rb_require("compacter");
-    // VALUE result = rb_require("C:/Users/Thomas/SourceTree/sketchup-live-c-api/cext/build/Debug/cext/tests/ruby/Debug/compacter.so");
-    // std::cout << "rb_require: " << result << "\n";
+    std::cout << "rb_require compacter ...\n";
+    result = rb_require("compacter");
+    std::cout << "rb_require: " << result << "\n";
 
     std::cout << "rb_require compact_fuzzer ...\n";
-    VALUE result = rb_require("compact_fuzzer");
+    result = rb_require("compact_fuzzer");
     std::cout << "rb_require: " << result << "\n";
   }
   return ruby_cleanup(0);

@@ -2,7 +2,7 @@
 
 extern "C" {
 
-void Init_compacter()
+__declspec(dllexport) void Init_compacter()
 {
   VALUE mExample = rb_define_module("Example");
   VALUE mCompacting = rb_define_module_under(mExample, "Compacting");
