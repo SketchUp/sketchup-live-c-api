@@ -8,6 +8,26 @@
 
 message(DEBUG "FindSketchUpAPI")
 
+set(_SketchUpAPI_2021_1
+  2021.1
+  SDK_WIN_x64_2021-1-279
+  SDK_Mac_2021-1-278
+)
+set(_SketchUpAPI_2021_0
+  2021.0
+  SDK_WIN_x64_2021-0-339
+  SDK_Mac_2021-0-338
+)
+set(_SketchUpAPI_2020_2
+  2020.2
+  SDK_WIN_x64_2020-2-172
+  SDK_Mac_2020-2-171
+)
+set(_SketchUpAPI_2020_1
+  2020.1
+  SDK_WIN_x64_2020-1-229
+  SDK_Mac_2020-1-228
+)
 set(_SketchUpAPI_2020_0
   2020.0
   SDK_WIN_x64_2020-0-363
@@ -25,13 +45,17 @@ set(_SketchUpAPI_2019_2
 )
 
 set(_SketchUpAPIs
+  ${_SketchUpAPI_2021_1}
+  ${_SketchUpAPI_2021_0}
+  ${_SketchUpAPI_2020_2}
+  ${_SketchUpAPI_2020_1}
   ${_SketchUpAPI_2020_0}
   ${_SketchUpAPI_2019_3}
   ${_SketchUpAPI_2019_2}
 )
 
-set(_num_versions 3) # UPDATE: Should match items in `_SketchUpAPIs`
-set(_version_size 3) # Size of the version arrays.
+set(_num_versions 7) # UPDATE: Should match items in `_SketchUpAPIs`
+set(_version_size 3) # Size of the _SketchUpAPI_* vars.
 
 LIST(LENGTH _SketchUpAPIs _length)
 MATH(EXPR _range_max "(${_version_size}*${_num_versions})-1")
@@ -145,7 +169,7 @@ find_library(SketchUpAPI_LIVE_LIBRARY ${_SketchUpAPI_LIVE_LIBRARY_NAME}
 
 if(APPLE)
   # Allow the bundle loader to be explicitly set. This is needed if
-  # is set SketchUpAPI_DIR since it is then not possible to infer package
+  # SketchUpAPI_DIR is set since it is then not possible to infer package
   # version.
   message(DEBUG "SketchUpAPI_BUNDLE_LOADER: ${SketchUpAPI_BUNDLE_LOADER}")
   message(DEBUG "SketchUpAPI_BUNDLE_LOADER (ENV): $ENV{SketchUpAPI_BUNDLE_LOADER}")
