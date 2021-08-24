@@ -6,7 +6,7 @@ When using the Live C API there is no need to call `SUInitialize()` and `SUTermi
 
 ## Entity Life Spans
 
-It's important to beware of the life-span of SketchUp's entities when using the Live C API. In contract to the SketchUp Ruby API, the C API's entity references are not invalidated if the internal entities are deleted. Make sure not to hold on to the entity references for long.
+It's important to beware of the life-span of SketchUp's entities when using the Live C API. In contrast to the SketchUp Ruby API, the C API's entity references are not invalidated if the internal entities are deleted. Make sure not to hold on to the entity references for long.
 
 ## Example
 
