@@ -116,6 +116,8 @@ You can set up this variable from VSCode for convenience:
 }
 ```
 
+Note that under macOS you will need a compatible version of SketchUp installed which will be used during linking. It will by default link against the SketchUp application matching the minimum SDK version. If you only have a newer version of SketchUp installed you need to override `SketchUpAPI_BUNDLE_LOADER` in `.vscode/settings.json`.
+
 After that is set up you should be able to invoke a successful CMake configuration:
 
 `<Command Palette>` » CMake: Configure

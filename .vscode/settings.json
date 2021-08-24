@@ -18,6 +18,10 @@
     "SketchUpAPI_SEARCH_DIR": "${workspaceRoot}/../../SLAPI",
     // Below config is used to provide explicit paths to the C API library
     // and bundle loader.
+    // For instance, if the project target lowest SketchUp version is 2020 and
+    // you only have SketchUp 2021 installed you want to override the
+    // SketchUpAPI_BUNDLE_LOADER as it will default to look for the SketchUp
+    // version matching the minimum SDK version.
     // "SketchUpAPI_DIR": "${workspaceRoot}/../../SLAPI/SDK_WIN_x64_2020-2-172",
     // "SketchUpAPI_BUNDLE_LOADER": "/Users/tthomas2/src/git/client/sketchup/products/Debug/SketchUp.app/Contents/MacOS/SketchUp"
     // "SketchUpAPI_BUNDLE_LOADER": "/Users/tthomas2/src/git/client/sketchup/products/Release/SketchUp.app/Contents/MacOS/SketchUp"

@@ -87,10 +87,11 @@
       "type": "pickString",
       "description": "SketchUp Version",
       "options": [
+        "2021",
         "2020",
         "2019"
       ],
-      "default": "2020"
+      "default": "2021"
     }
   ]
 }

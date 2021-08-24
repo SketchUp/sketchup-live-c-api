@@ -6,7 +6,7 @@ AllCops:
   ExtraDetails: true
   SketchUp:
     SourcePath: ruby
-    TargetSketchUpVersion: 2018
+    TargetSketchUpVersion: 2020
   Exclude:
     - cext/**/*
     - third-party/**/*

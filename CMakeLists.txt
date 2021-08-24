@@ -13,8 +13,9 @@ if(NOT (WIN32 OR APPLE))
   message(FATAL_ERROR "This project only works on Windows or macOS.")
 endif()
 
-# SketchUp 2019.0 supports macOS 10.12 and newer.
-set(CMAKE_OSX_DEPLOYMENT_TARGET "10.12" CACHE STRING "Minimum OS X deployment version")
+# Depending on SketchUp 2020.2+ features.
+# SketchUp 2020.2 supports macOS 10.13 and newer.
+set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "Minimum OS X deployment version")
 
 # https://cmake.org/cmake/help/latest/guide/tutorial/index.html
 # TODO(Example): Name your project:
@@ -117,7 +118,7 @@ set(gtest_force_shared_crt OFF CACHE BOOL "" FORCE)
 set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
 
 # Find the SketchUp C API SDK package:
-find_package(SketchUpAPI 2019.3 REQUIRED)
+find_package(SketchUpAPI 2020.2 REQUIRED)
 
 add_subdirectory(third-party/google-test)
 add_subdirectory(cext/image_lib)
