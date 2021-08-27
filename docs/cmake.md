@@ -116,7 +116,11 @@ You can set up this variable from VSCode for convenience:
 }
 ```
 
-Note that under macOS you will need a compatible version of SketchUp installed which will be used during linking. It will by default link against the SketchUp application matching the minimum SDK version. If you only have a newer version of SketchUp installed you need to override `SketchUpAPI_BUNDLE_LOADER` in `.vscode/settings.json`.
+Note that under macOS you will need a compatible version of SketchUp installed which will be used during linking. It will by default link against the SketchUp application matching the minimum SDK version. If you only have a newer version of SketchUp installed you need to override `SketchUpAPI_BUNDLE_LOADER` in `.vscode/settings.json`. This needs to point to the executable itself and not just the app bundle directory. Example:
+
+```
+/Applications/SketchUp 2021/SketchUp.app/Contents/MacOS/SketchUp
+```
 
 After that is set up you should be able to invoke a successful CMake configuration:
 
