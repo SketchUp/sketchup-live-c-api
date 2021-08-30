@@ -9,6 +9,9 @@ cext/build/
 .vs/
 out/
 
+# Example build directory
+build/
+
 # Binaries
 *.so
 *.bundle
