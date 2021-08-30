@@ -29,7 +29,9 @@ cmake --build . --config Release
 
 ### Build via Visual Studio
 
-Open the `build/Example.sln` solution and build from Visual Studio. (Assuming the Visual Studio generator is the default on your system.)
+Add `-G "Visual Studio 16 2019" -A x64` to the command while configuring the project.
+
+Open the `build/Example.sln` solution and build from Visual Studio.
 
 ## macOS
 
