@@ -28,6 +28,7 @@ This is a guide demonstrating how to setup and build your own Ruby C extension t
 The code in this repository will demonstrate a [CMake](https://cmake.org/) project for a Windows & Mac builds. This CMake project can be used to create a [Visual Studio solution](https://visualstudio.microsoft.com/), [Xcode project](https://developer.apple.com/xcode/).
 
 * [How to build the CMake example project](docs/cmake.md)
+* [How to build the CMake example project via VSCode](docs/cmake-vscode.md)
 
 ## Editor Instructions
 
