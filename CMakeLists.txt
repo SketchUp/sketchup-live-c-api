@@ -15,7 +15,11 @@ endif()
 
 # Depending on SketchUp 2020.2+ features.
 # SketchUp 2020.2 supports macOS 10.13 and newer.
-set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "Minimum OS X deployment version")
+set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "Minimum macOS deployment version")
+
+# SketchUp 2022.0 supports macOS arm64 architecture. Ruby C Extensions built
+# for older versions needs to adjust the OSX_ARCHITECTURE property to x86_64 only.
+set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "macOS archtectures to build")
 
 # https://cmake.org/cmake/help/latest/guide/tutorial/index.html
 # TODO(Example): Name your project:

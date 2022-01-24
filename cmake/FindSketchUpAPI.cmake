@@ -8,6 +8,11 @@
 
 message(DEBUG "FindSketchUpAPI")
 
+set(_SketchUpAPI_2022_0 # RC1
+  2022.0
+  SDK_WIN_x64_2022-0-316
+  SDK_Mac_2022-0-315
+)
 set(_SketchUpAPI_2021_1
   2021.1
   SDK_WIN_x64_2021-1-279
@@ -45,6 +50,7 @@ set(_SketchUpAPI_2019_2
 )
 
 set(_SketchUpAPIs
+  ${_SketchUpAPI_2022_0}
   ${_SketchUpAPI_2021_1}
   ${_SketchUpAPI_2021_0}
   ${_SketchUpAPI_2020_2}
@@ -54,7 +60,7 @@ set(_SketchUpAPIs
   ${_SketchUpAPI_2019_2}
 )
 
-set(_num_versions 7) # UPDATE: Should match items in `_SketchUpAPIs`
+set(_num_versions 8) # UPDATE: Should match items in `_SketchUpAPIs`
 set(_version_size 3) # Size of the _SketchUpAPI_* vars.
 
 LIST(LENGTH _SketchUpAPIs _length)
@@ -119,12 +125,12 @@ else() # Otherwise, search for a location.
     message(DEBUG "SketchUpAPI_FIND_VERSION_EXACT: ${SketchUpAPI_FIND_VERSION_EXACT}")
     message(DEBUG "SketchUpAPI_FIND_VERSION: ${SketchUpAPI_FIND_VERSION}")
     if(SketchUpAPI_FIND_VERSION_EXACT)
-      if(NOT ${SketchUpAPI_FIND_VERSION} VERSION_EQUAL ${_SketchUpAPI_VERSION})
+      if(NOT ${_SketchUpAPI_VERSION} VERSION_EQUAL ${SketchUpAPI_FIND_VERSION})
         message(DEBUG "NOT SketchUpAPI_FIND_VERSION VERSION_EQUAL")
         continue()
       endif()
     else()
-      if(NOT ${SketchUpAPI_FIND_VERSION} VERSION_GREATER_EQUAL ${_SketchUpAPI_VERSION})
+      if(NOT ${_SketchUpAPI_VERSION} VERSION_GREATER_EQUAL ${SketchUpAPI_FIND_VERSION})
         message(DEBUG "NOT SketchUpAPI_FIND_VERSION VERSION_GREATER_EQUAL")
         continue()
       endif()

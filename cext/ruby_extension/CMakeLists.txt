@@ -1,6 +1,6 @@
 include(RubyExtension)
 
-find_package(SketchUpRuby 2021.0 REQUIRED)
+find_package(SketchUpRuby 2022.0 REQUIRED)
 
 # CMake recommends not using GLOB to collect a list of source files from
 # the source tree.

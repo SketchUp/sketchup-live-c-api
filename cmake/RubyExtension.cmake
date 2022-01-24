@@ -124,6 +124,20 @@ function(add_ruby_extension_library
     set_target_properties(${EXTENSION_LIB} PROPERTIES PREFIX "")
   endif()
 
+  if(APPLE)
+    if(${RUBY_VERSION} VERSION_LESS "2.7")
+      message(DEBUG "Setting OSX_ARCHITECTURES to x86_64...")
+      set_target_properties(${EXTENSION_LIB} PROPERTIES
+        OSX_ARCHITECTURES "x86_64"
+      )
+    else()
+      message(DEBUG "Setting OSX_ARCHITECTURES to arm64;x86_64...")
+      set_target_properties(${EXTENSION_LIB} PROPERTIES
+        OSX_ARCHITECTURES "arm64;x86_64"
+      )
+    endif()
+  endif()
+
   # Verify targets link against live C API.
   include("DependencyTools")
   validate_dependencies(${EXTENSION_LIB}

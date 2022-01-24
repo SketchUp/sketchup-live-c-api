@@ -6,7 +6,7 @@
 # https://cmake.org/cmake/help/latest/manual/cmake-developer.7.html#manual:cmake-developer(7)
 # https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#imported-targets
 
-set(SketchUpRuby_VERSION "2021.0")
+set(SketchUpRuby_VERSION "2022.0")
 
 find_path(_SketchUpRuby_ROOT_DIR "SketchUp Ruby C Extension Examples.sln")
 set(_SketchUpRuby_THIRD_PARTY_DIR ${_SketchUpRuby_ROOT_DIR}/ThirdParty)
@@ -88,11 +88,7 @@ elseif(APPLE)
       ${_SketchUpRuby_THIRD_PARTY_DIR}/include/ruby/2.7/mac
     NO_DEFAULT_PATH # Needed to ensure system Ruby isn't picked up
   )
-  find_path(_SketchUpRuby_270_INCLUDE_SUPPORT_DIR "ruby/config.h"
-    HINTS
-      ${_SketchUpRuby_THIRD_PARTY_DIR}/include/ruby/2.7/mac/x86_64-darwin18
-    NO_DEFAULT_PATH # Needed to ensure system Ruby isn't picked up
-  )
+  # As of SketchUp 2022 we no longer need to find ruby/config.h.
   set(_SketchUpRuby_270_INCLUDE_DIR
     ${_SketchUpRuby_270_INCLUDE_ROOT_DIR}
     ${_SketchUpRuby_270_INCLUDE_SUPPORT_DIR}
@@ -146,7 +142,7 @@ endif()
 # Ruby 2.7
 find_library(SketchUpRuby_270_LIBRARY ${_SketchUpRuby_270_LIB_NAME}
   HINTS
-    ${_SketchUpRuby_THIRD_PARTY_DIR}/lib/mac/2.7
+    ${_SketchUpRuby_THIRD_PARTY_DIR}/lib/mac/2.7-universal
     ${_SketchUpRuby_THIRD_PARTY_DIR}/lib/win32
   NO_DEFAULT_PATH # Needed to ensure system Ruby isn't picked up
 )
