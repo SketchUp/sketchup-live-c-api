@@ -1,5 +1,7 @@
 # SketchUp Live C API Examples
 
+_These examples are for usage within the SketchUp desktop application. They will not work for usage in other applications._
+
 The [SketchUp C API](https://extensions.sketchup.com/sketchup-sdk) is mainly used for the following:
 
 * Read/Write `.skp` files in applications other than SketchUp.
