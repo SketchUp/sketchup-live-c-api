@@ -23,7 +23,7 @@ This is a guide demonstrating how to setup and build your own Ruby C extension t
 ### macOS
 
 * Add `<SDK_PATH>` to framework search paths.
-* Set `/Application/SketchUp 2019/SketchUp.app/Contents/MacOS/SketchUp` as the bundle loader. (Do **not** link against `SketchUpAPI.framework`!)
+* Set `/Applications/SketchUp 2023/SketchUp.app/Contents/MacOS/SketchUp` as the bundle loader. (Do **not** link against `SketchUpAPI.framework`!)
 
 ## CMake Example Project
 
